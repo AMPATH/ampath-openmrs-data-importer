@@ -6,6 +6,7 @@
   "scripts": {
     "start": "tsc && node ./build/app/app.js",
     "migrate-users": "tsc && node ./build/app/users/process-user-migration.js",
+    "find-recurrent-patients": "tsc && node ./build/app/patient-match/find-recurrent-patient.js",
     "extract:concepts": "node app/process-concepts.js",
     "tsc": "tsc"
   },
@@ -20,9 +21,18 @@
   },
   "homepage": "https://github.com/nkimaina/ampath-openmrs-data-importer#readme",
   "dependencies": {
+    "@types/btoa": "^1.2.3",
+    "@types/dotenv": "^8.2.0",
+    "@types/node-fetch": "^2.5.7",
+    "abort-controller": "^3.0.0",
+    "axios": "^0.19.2",
+    "btoa": "^1.2.1",
     "csv-parser": "^2.3.3",
     "csv-writer": "^1.6.0",
+    "dotenv": "^8.2.0",
+    "moment": "^2.29.0",
     "mysql": "^2.18.1",
+    "node-fetch": "^2.6.1",
     "typescript": "^4.0.2"
   },
   "devDependencies": {

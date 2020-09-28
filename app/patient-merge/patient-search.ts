@@ -2,6 +2,13 @@ import * as config from "../../configs/config.json";
 import btoa from "btoa";
 import fetch from "node-fetch";
 
+const AbortController = require('abort-controller');
+
+const controller = new AbortController();
+const timeout = setTimeout(() => {
+	controller.abort();
+}, 10000);
+
 const username = config.openmrs.username;
 const password = config.openmrs.password;
 
@@ -11,6 +18,7 @@ export default async function patientSearch(query: string) {
   try {
     const response = await fetch(constructUrl(query), {
       method: "GET",
+      signal: controller.signal,
       headers: {
         Authorization: "Basic " + btoa(username + ":" + password),
         "Content-Type": "application/json",
@@ -18,7 +26,12 @@ export default async function patientSearch(query: string) {
     });
     return response.json();
   } catch (error) {
+    if (error.name === 'AbortError') {
+      console.log('request was aborted');
+    }
     console.log("Error fetching search results: ", error);
+  } finally {
+    clearTimeout(timeout);
   }
 };
 
