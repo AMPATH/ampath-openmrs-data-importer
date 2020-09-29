@@ -1,16 +1,16 @@
 {
-    "kenyaemrConnection": {
-        "host": "",
-        "user": "",
-        "password": "",
-        "database": "",
-        "port": ""
-    },
-    "amrsConnection": {
-        "host": "",
-        "user": "",
-        "password": "",
-        "database": "",
-        "port": ""
-    }
+  "kenyaemrConnection": {
+    "host": "",
+    "user": "",
+    "password": "",
+    "database": "",
+    "port": ""
+  },
+  "amrsConnection": {
+    "host": "",
+    "user": "",
+    "password": "",
+    "database": "",
+    "port": ""
+  }
 }

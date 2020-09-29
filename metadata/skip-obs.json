@@ -1,11 +1,11 @@
 {
-    "1087342": {
-        "reason": "Incorrect answer to question concept 6032"
-    },
-    "1222226": {
-        "reason": "Incorrect answer to question concept 6032"
-    },
-    "1082734": {
-        "reason": "Only one obs found. CCC identifier stored as obs. "
-    }
+  "1087342": {
+    "reason": "Incorrect answer to question concept 6032"
+  },
+  "1222226": {
+    "reason": "Incorrect answer to question concept 6032"
+  },
+  "1082734": {
+    "reason": "Only one obs found. CCC identifier stored as obs. "
+  }
 }

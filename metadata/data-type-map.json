@@ -1,33 +1,33 @@
 {
-    "1855": {
-        "amrs_id": 9070,
-        "type": "coded-coded",
-         "values": {
-             "2": "1066",
-             "1": "1065"
-         }
-    },
-    "5272": {
-        "amrs_id": 5272,
-        "type": "coded-coded",
-         "values": {
-             "1066": "1066",
-             "1065": "1065"
-         }
-    },
-    "160429": {
-        "amrs_id": 8701,
-        "type": "numeric-coded",
-         "values": {
-             "1": "1065"
-         }
-    },
-    "162095": {
-        "amrs_id": 6746,
-        "type": "coded-coded",
-         "values": {
-             "2": "1066",
-             "1": "1065"
-         }
+  "1855": {
+    "amrs_id": 9070,
+    "type": "coded-coded",
+    "values": {
+      "2": "1066",
+      "1": "1065"
     }
+  },
+  "5272": {
+    "amrs_id": 5272,
+    "type": "coded-coded",
+    "values": {
+      "1066": "1066",
+      "1065": "1065"
+    }
+  },
+  "160429": {
+    "amrs_id": 8701,
+    "type": "numeric-coded",
+    "values": {
+      "1": "1065"
+    }
+  },
+  "162095": {
+    "amrs_id": 6746,
+    "type": "coded-coded",
+    "values": {
+      "2": "1066",
+      "1": "1065"
+    }
+  }
 }
