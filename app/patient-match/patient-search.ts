@@ -9,17 +9,13 @@ const timeout = setTimeout(() => {
 	controller.abort();
 }, 10000);
 
-const username = config.openmrs.username;
-const password = config.openmrs.password;
-const baseurl = config.openmrs.baseurl;
-
 export default async function patientSearch(query: string) {
   try {
     const response = await fetch(constructUrl(query), {
       method: "GET",
       signal: controller.signal,
       headers: {
-        Authorization: "Basic " + btoa(username + ":" + password),
+        Authorization: "Basic " + btoa(config.openmrs.username + ":" + config.openmrs.password),
         "Content-Type": "application/json",
       },
     });
@@ -43,5 +39,5 @@ const constructUrl = (query: string) => {
     "preferredName:(uuid,preferred,givenName,middleName,familyName),attributes," +
     "preferredAddress:(uuid,preferred,address1,address2,cityVillage,longitude,stateProvince,latitude,country,postalCode,countyDistrict,address3,address4,address5,address6,address7)))";
 
-  return baseurl + "/ws/rest/v1/patient?q=" + query + "&v=" + v;
+  return config.openmrs.baseurl + "/ws/rest/v1/patient?q=" + query + "&v=" + v;
 };
