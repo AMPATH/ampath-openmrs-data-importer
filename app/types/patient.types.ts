@@ -6,3 +6,9 @@ export type PatientComparator = {
     Kenya_emr_identifiers: string,
     Kenya_emr_names: string
 }
+
+export type PatientData = {
+    person:any,
+    names: Array<any>,
+    identifiers: Array<any>
+}

@@ -104,3 +104,4 @@ build/
 # TernJS port file
 .tern-port
 config.json
+metadata/possible-existing-patients.csv

@@ -11,7 +11,6 @@ const timeout = setTimeout(() => {
 
 const username = config.openmrs.username;
 const password = config.openmrs.password;
-
 const baseurl = config.openmrs.baseurl;
 
 export default async function patientSearch(query: string) {
