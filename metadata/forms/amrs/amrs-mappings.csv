@@ -1,4 +1,31 @@
 Question Concept_id,AMRS  (Question/Answer),amrs_concept_id,KenyaEMR  (Question/Answer),emr_concept_id
+6174,Screening questions,6174,1729,1729
+6174,Cough of any duration,6171,159799,159799
+6174,Fever,6173,1494,1494
+6174,Noticeable weight loss or poor weight gain,832,832,832
+6174,Night sweats,6029,133027,133027
+6174,Contact with a TB Case,7444,124068,124068
+6174,Lethergy,5949,116334,116334
+10679,Indication for IPT ,10679,162276,162276
+10679,HIV positive ,1169,138571,138571
+10679,In prison,8602,162277,162277
+10679,Child exposed to tuberculosis,10680,162278,162278
+10783,IPT Due Date,10783,164073,164073
+10784,Date collected IPT,10784,164074,164074
+5089,Weight,5089,5089,5089
+10785,we,10785,159098,159098
+10785,Yes,1065,1065,1065
+10785,No,1066,1066,1066
+10786,te,10786,118983,118983
+10786,Yes,1065,1065,1065
+10786,No,1066,1066,1066
+10787,Does the patient have Rash?,10787,512,512
+10787,Yes,1065,1065,1065
+10787,No,1066,1066,1066
+10788,t,10788,164075,164075
+10788,Good,6343,159405,159405
+10788,Fair,6655,159406,159406
+10788,Poor,6656,159407,159407
 7000,Regular sexual partner,7000,Regular sexual partner,166505
 6744,Third line hiv antiretroviral drug treatment,6695,166076,166076
 6744,Current HIV antiretroviral drug use treatment category,6744,Current HIV antiretroviral drug use treatment category,163104
@@ -59,7 +86,6 @@ Question Concept_id,AMRS  (Question/Answer),amrs_concept_id,KenyaEMR  (Question/
 7128,DTG50mg/3TC300mg/TDF300mg,10268,DTG50mg/3TC300mg/TDF300mg,164969
 966,Zidovudine/Lamiivudine/Dolutegravir,10985,Zidovudine/Lamiivudine/Dolutegravir,164968
 1086,Zidovudine/Lamiivudine/Dolutegravir,10985,Zidovudine/Lamiivudine/Dolutegravir,164968
-1088,Dolutegravir 50mg (dolutegravir),9759,Dolutegravir 50mg (dolutegravir),164967
 1088,Dolutegravir,9759,Dolutegravir,164967
 1176,Dolutegravir ,9759,Dolutegravir ,164967
 1250,Dolutegravir 50mg (Dolutegravir),9759,Dolutegravir 50mg (Dolutegravir),164967
@@ -2316,56 +2342,6 @@ Non-adherence with treatment or therapy",159598
 1262,Facility stocked out of medication,7043,Facility stocked out of medication,1754
 1269,Facility stocked out of medication ,7043,Facility stocked out of medication ,1754
 1252,Facility stocked out of medication,7043,Facility stocked out of medication,1754
-2055,Antenatal care enrolled,2055,"Antenatal care during pregnancy
-",1718
-1605,Secondary school,6215,Secondary school,1714
-1605,Primary school ,6214,Primary school ,1713
-1605,Highest education,1605,Highest education level,1712
-1552,Not at home ,1563,Not at home ,1706
-6386,Public water tap ,6375,Public water tap ,1697
-7087,Discharge status,7087,Discharge status,1695
-2158,Post exposure prophylaxis ,2090,Post exposure prophylaxis ,1691
-2155,Post exposure prophylaxis ,2090,Post exposure prophylaxis ,1691
-1251,Post exposure prophylaxis ,2090,Post exposure prophylaxis ,1691
-6981,Reason tuberculosis treatment started,6981,Reason tuberculosis treatment started,1689
-6981,Tuberculosis treatment retreated after relapse or re-infection ,6980,Tuberculosis treatment retreated after relapse or re-infection ,1688
-6981,New tuberculosis treatment ,6977,New tuberculosis treatment ,1687
-984,Pentavalent vaccine,6654,Pentavalent vaccine,1685
-1198,Pentavalent vaccine,6654,Pentavalent vaccine,1685
-5616,Household members,1675,Household members,1675
-8292,Confirmed ,6137,Confirmed ,1661
-8292,Tuberculosis disease status,8292,Tuberculosis disease status,1659
-8288,Antiretroviral adherence since last visit,8288,Antiretroviral adherence since last visit,1658
-966,Nevirapine/Lamivudine/Zidovudine,6467,Nevirapine/Lamivudine/Zidovudine,1652
-1086,Nevirapine/Lamivudine/Zidovudine,6467,Nevirapine/Lamivudine/Zidovudine,1652
-1088,Nevirapine lamivudine and zidovudine,6467,Nevirapine lamivudine and zidovudine,1652
-1088,3tc 30 and nvp 50 and zdv 60 (nevirapine lamivudine and zidovudine),6467,3tc 30 and nvp 50 and zdv 60 (nevirapine lamivudine and zidovudine),1652
-1088,Nvp 200 and 3tc150 and zdv 300 (nevirapine lamivudine and zidovudine),6467,Nvp 200 and 3tc150 and zdv 300 (nevirapine lamivudine and zidovudine),1652
-1088,Nvp and 3tc and azt (nevirapine lamivudine and zidovudine),6467,Nvp and 3tc and azt (nevirapine lamivudine and zidovudine),1652
-1176,Nevirapine Lamivudine and Zidovudine,6467,Nevirapine Lamivudine and Zidovudine,1652
-1087,Nevirapine Lamivudine and Zidovudine ,6467,Nevirapine Lamivudine and Zidovudine ,1652
-1087,NVP 200 and 3TC 150 and ZDV 300 (Nevirapine Lamivudine and Zidovudine),6467,NVP 200 and 3TC 150 and ZDV 300 (Nevirapine Lamivudine and Zidovudine),1652
-1087,3TC 30 and NVP 50 and ZDV 60 (Nevirapine Lamivudine and Zidovudine),6467,3TC 30 and NVP 50 and ZDV 60 (Nevirapine Lamivudine and Zidovudine),1652
-1250,Nevirapine Lamivudine and Zidovudine,6467,Nevirapine Lamivudine and Zidovudine,1652
-1250,NVP 200 and 3TC 150 and zdv 300 (Nevirapine Lamivudine and Zidovudine),6467,NVP 200 and 3TC 150 and zdv 300 (Nevirapine Lamivudine and Zidovudine),1652
-1250,3TC 30 and NVP 50 and ZDV 60 (Nevirapine Lamivudine and Zidovudine),6467,3TC 30 and NVP 50 and ZDV 60 (Nevirapine Lamivudine and Zidovudine),1652
-2199,Nevirapine Lamivudine and Zidovudine,6467,Nevirapine Lamivudine and Zidovudine,1652
-2157,NVP 200 and 3TC 150 and ZDV 300 (Nevirapine Lamivudine and Zidovudine),6467,NVP 200 and 3TC 150 and ZDV 300 (Nevirapine Lamivudine and Zidovudine),1652
-2157,Nevirapine Lamivudine and Zidovudine ,6467,Nevirapine Lamivudine and Zidovudine ,1652
-2154,3TC 30 and NVP 50 and Zdv 60 (Nevirapine Lamivudine and Zidovudine),6467,3TC 30 and NVP 50 and Zdv 60 (Nevirapine Lamivudine and Zidovudine),1652
-2154,Nevirapine Lamivudine and Zidovudine ,6467,Nevirapine Lamivudine and Zidovudine ,1652
-2154,NVP 200 and 3TC 150 and ZDV 300 (Nevirapine Lamivudine and Zidovudine),6467,NVP 200 and 3TC 150 and ZDV 300 (Nevirapine Lamivudine and Zidovudine),1652
-7128,NVP200mg/ZDV300mg/3TC150mg,6467,NVP200mg/ZDV300mg/3TC150mg,1652
-6397,Mobile Phone ,6394,Mobile Phone ,1650
-6398,Mobile phone ,6394,Mobile phone ,1650
-1558,Phone ,1555,Phone ,1650
-6246,Negative review of medical history,6246,1634,1634
-6245,Review of medical history,6245,Review of medical history,1628
-2073,Do not know ,1624,Do not know ,1624
-6193,Antenatal care service ,1865,Antenatal care service ,1622
-11304,Referral for opportunistic infection treatment,11304,Referral for opportunistic infection treatment,1611
-11303,Referral for antiretroviral therapy,11303,Referral for antiretroviral therapy,1610
-1938,"Capsule, dosage form",1938,"Capsule, dosage form",1608
 1939,"Capsule, dosage form ",1938,"Capsule, dosage form ",1608
 1573,Death due to non natural cause ,10367,Death due to non natural cause ,1603
 6109,Investigation for cause of death,6109,Investigation for cause of death,1602
@@ -3043,6 +3019,7 @@ Non-adherence with treatment or therapy",159598
 6245,None,1107,None,1107
 1251,None ,1107,None ,1107
 1675,None ,1107,None ,1107
+1107,None ,1107,None ,1107
 5320,Ten or more,1106,Ten or more,1106
 5320,Seven to nine ,1105,Seven to nine ,1105
 5320,Five to six ,1104,Five to six ,1104
@@ -4080,189 +4057,65 @@ Nevirapine)",792
 1271,Hemoglobin ,21,Hemoglobin ,21
 21,Hemoglobin,21,Hemoglobin,21
 1866,Hemoglobin,21,Hemoglobin,21
+1271,Tests Ordered,1271,1271,1271
+1271,Sputum Smear,307,307,307
+1271,Chest Xray,12,12,12
+1271,GeneXpert,10761,162202,162202
+307,Sputum Smear,307,307,307
+307,Positive,703,703,703
+307,Negative,664,664,664
+12,Chest X-ray,12,12,12
+12,Normal,1115,1115,1115
+12,Abnormal chest xray,10765,152526,152526
+1272,Referral,1272,1272,1272
+1272,Yes,1065,1065,1065
+1272,No,1066,1066,1066
+10761,GeneXpert,10761,162202,162202
+10761,Negative,664,664,664
+10761,MTB detected with rifampin resistance,10762,162203,162203
+10761,MTB detected without rifampin resistance,10763,162204,162204
+10761,Mycobacterium tuberculosis detected with indeterminate rifampin resistance,10764,164104,164104
+10761,Invalid ,10766,163611,163611
+10761,Indeterminate,1138,1138,1138
+2028,Clinical diagnosis,2028,163752,163752
+2028,Positive,703,703,703
+2028,Negative,664,664,664
+10676,Invitation of contacts,10676,163414,163414
+10676,Positive,703,703,703
+10676,Negative,664,664,664
+7502,Evaluated for IPT,7502,162275,162275
+7502,Yes,1065,1065,1065
+7502,No,1066,1066,1066
+8292,Resulting TB Status,8292,1659,1659
+8292,No TB Signs,10678,1660,1660
+8292,Presumed TB,6971,142177,142177
+8292,TB Confirmed,10767,1662,1662
+8292,TB Screening Not Done,6621,160737,160737
+10677,Start Anti-TBs,10677,162309,162309
+10677,Yes,1065,1065,1065
+10677,No,1066,1066,1066
+1113,TB Rx date,1113,1113,1113
+1111,TB Tx,1111,1111,1111
+8601,Yellow Urine,8601,162311,162311
+8601,Yes,1065,1065,1065
+8601,No,1066,1066,1066
+1480,Numbness/ burning sensation on the hands or feet,1480,132652,132652
+1480,Yes,1065,1065,1065
+1480,No,1066,1066,1066
+5192,Yellowness of eyes,5192,5192,5192
+5192,Yes,1065,1065,1065
+5192,No,1066,1066,1066
+9028,Tenderness in the upper right quadrant of the abdomen,9028,124994,
+9028,Yes,1065,1065,1065
+9028,No,1066,1066,1066
+8606,Completed,1267,1267,1267
+8606,Lost to followup,5240,5240,5240
+8606,Discontinue,6102,159836,159836
+8606,Died,1593,160034,160034
+8606,Transferred out,1594,159492,159492
+8606,TB infected,58,112141,112141
+8606,Drug toxicity,102,102,102
 1271,"Chest xray, preliminary findings",12,"Chest xray, preliminary findings",12
 12,"Chest xray, preliminary findings",12,"Chest xray, chest",12
 2028,"Chest xray, preliminary findings",12,"Chest xray, preliminary findings",12
 1866,"X-ray, chest, preliminary findings",12,"X-ray, chest, preliminary findings",12
-1070,Presence of pain,7032,-,
-1080,Signs of labor,6261,,
-1120,Skin of orange,8189,Skin of orange,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-1654,Probably yes,1628,Probably yes,
-1654,No,1066,No,
-1654,Definitely yes,1627,Definitely yes,
-1659,"Days missed all pills in past week, any medicine",1659,"Days missed all pills in past week, any medicine",
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-1841,"Disability specify, freetext",-,-,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-1412,Individual who picked drugs ,1412,Individual who picked drugs ,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-6163,Paper patient chart ,6953,-,
-6193,Hct follow-up order,6193,-,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-1924,"Toxicity, cause ",1879,"Toxicity, cause ",
-,,,,
-,,,,
-,,,,
-2014,Joint swelling duration,2014,-,
-2028,Positive result of sputum for acid fast bacilli ,9543,Positive result of sputum for acid fast bacilli ,
-2028,Positive sputum for acid fast bacilli ,2026,Positive sputum for acid fast bacilli ,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-7075,Yes,1065,Yes,
-7075,No,1066,No,
-,,,,
-,,,,
-,,,,
-1705,Recommendations made,1705,Recommendations made,
-7121,Type of mucous membrane exposure ,7096,-,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-655,Serum total bilirubin,655,,
-717,Serum total protein,717,,
-785,Serum alkaline phosphatase,785,,
-848,Serum albumin,848,,
-1011,Serum creatinine kinase,1011,,
-1013,Serum lipase,1013,,
-1132,Serum sodium,1132,,
-1133,Serum pottasium,1133,,
-1134,Serum chloride,1134,,
-1135,Serum bicarbonate,1135,,
-1297,Serum bilrubin,1297,,
-1299,Serum amylase,1299,,

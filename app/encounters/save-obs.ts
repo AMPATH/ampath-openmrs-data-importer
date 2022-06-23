@@ -31,6 +31,7 @@ export default async function savePatientObs(
   );
   insertMap.obs = map;
   //await updateObsGroupIds(obsToInsert, insertMap, connection);
+  //connection.destroy()
 }
 
 export type ObsMap = {
@@ -75,7 +76,6 @@ export async function saveObs(
         connection
       );
       if (!value_coded[0]?.concept_id) {
-        console.log("Opeeee", value_coded, mappedObs[i].value_coded);
         mappedObs[i].value_coded = 1067;
       }
     }
@@ -236,8 +236,6 @@ export function mapObsConcept(
       conceptMap[sourceObs.concept_id]?.toString(),
       0
     );
-  } else {
-    console.log("sijaona hii", sourceObs.concept_id);
   }
 }
 
@@ -335,7 +333,6 @@ function mapMatchingTypeObsValue(
 ) {
   if (sourceObs.value_coded) {
     let a: any = conceptMap[sourceObs.value_coded];
-    console.log("Kalina", a, sourceObs.value_coded);
     if (a && Number.isInteger(a[0])) {
       newObs.value_coded = parseInt(a[0]?.toString());
     }

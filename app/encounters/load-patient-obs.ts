@@ -25,7 +25,11 @@ export default async function loadPatientObs(
   //   const sql = `SELECT o.* FROM     obs o         JOIN     encounter e ON e.encounter_id = o.encounter_id WHERE     o.person_id = ${personId} AND o.voided = 0         AND e.encounter_type  not IN (1 , 32, 3, 73, 105,208,69) AND (e.encounter_datetime >= "${moment(
   //     date[0].date
   //   ).format("YYYY-MM-DD")}" - INTERVAL 2 year)  ORDER BY o.obs_group_id ASC`;
-  const sql = `SELECT o.* FROM     obs o         JOIN     encounter e ON e.encounter_id = o.encounter_id WHERE     o.person_id = ${personId} AND o.voided = 0         AND e.encounter_type  not IN (1 , 32, 3, 73, 105,208,69) and o.concept_id not in (1088,1255,6744,1772,1677,1252,1191,1499)`;
+  const sql = `SELECT o.* FROM     obs o         JOIN     encounter e ON e.encounter_id = o.encounter_id WHERE     o.person_id = ${personId} AND o.voided = 0         AND e.encounter_type  not IN (208,69,86,142
+    ,143
+    ,146
+    ,160
+    ) and o.concept_id not in (1088,1255,6744,1772,1677,1252,1191,1499)`;
   let results: Obs[] = await CM.query(sql, connection);
   //console.log("Obs for 2 yrs", sql, results);
   return results;
@@ -97,7 +101,17 @@ export async function LoadCurrentHivSummary(
   patientId: any,
   connection: Connection
 ) {
-  const sql = `SELECT * FROM etl.flat_hiv_summary_v15b a WHERE a.person_id = ${patientId} AND a.encounter_type IN (2) and a.prev_arv_meds != a.cur_arv_meds ORDER BY encounter_datetime DESC limit 1;`;
+  const sql = `SELECT * FROM etl.flat_hiv_summary_v15b a WHERE a.person_id = ${patientId} AND a.encounter_type IN (1,2,4,3,105,106) and a.prev_arv_meds != a.cur_arv_meds and a.prev_arv_start_date is not null ORDER BY a.visit_num DESC limit 1;`;
   let results: any = await CM.query(sql, connection);
+  console.log("Hiv summary", results);
+  return results[0];
+}
+export async function LoadSingleHivSummary(
+  patientId: any,
+  connection: Connection
+) {
+  const sql = `SELECT * FROM etl.flat_hiv_summary_v15b a WHERE a.person_id = ${patientId} AND a.encounter_type IN (1,2,4,3,105,106) and a.cur_arv_meds is not null ORDER BY a.visit_num DESC limit 1;`;
+  let results: any = await CM.query(sql, connection);
+  console.log("Single Hiv summary", results);
   return results[0];
 }

@@ -34,8 +34,9 @@ export default async function transferPatientToAmrs(personId: number) {
 
       await savePatientData(patient, emrcon);
       saved = await loadPatientDataByUuid(patient.person.uuid, emrcon);
-
-      await savePatient(patient, saved.person.person_id, emrcon);
+      if (patient.patient) {
+        await savePatient(patient, saved.person.person_id, emrcon);
+      }
       let insertMap: InsertedMap = {
         patient: saved.person.person_id,
         visits: {},
@@ -63,25 +64,19 @@ export default async function transferPatientToAmrs(personId: number) {
         emrcon
       );
       await savePersonAttributes(patient, insertMap, amrsEmrCon, emrcon);
-      await saveProgramEnrolments(
-        patient.patientPrograms,
-        patient,
-        insertMap,
-        emrcon
-      );
 
       // TODO Create visits for all encounters and backdate to 3 hrs.
 
       //await saveVisitData(patient, insertMap, emrcon, emrcon);
       //Saves enrollment  encounter type
-      await saveEncounterData(
-        patient.encounter,
-        insertMap,
-        amrsEmrCon,
-        emrcon,
-        personId,
-        1
-      );
+      // await saveEncounterData(
+      //   patient.encounter,
+      //   insertMap,
+      //   amrsEmrCon,
+      //   emrcon,
+      //   personId,
+      //   1
+      // );
       //Saves other encounters
       await saveEncounterData(
         patient.encounter,
@@ -90,6 +85,12 @@ export default async function transferPatientToAmrs(personId: number) {
         emrcon,
         personId,
         2
+      );
+      await saveProgramEnrolments(
+        patient.patientPrograms,
+        patient,
+        insertMap,
+        emrcon
       );
       await saveVisitData(emrcon, saved.person.person_id);
       await saveProviderData(

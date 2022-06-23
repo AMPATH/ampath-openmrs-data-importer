@@ -52,11 +52,12 @@ export async function savePatient(
 ) {
   const userMap = UserMapper.instance.userMap;
   let replaceColumns = {};
+  console.log(patient);
   if (userMap) {
     replaceColumns = {
-      creator: userMap[patient.patient.creator],
-      changed_by: userMap[patient.patient.changed_by],
-      voided_by: userMap[patient.patient.voided_by],
+      creator: userMap[patient.patient?.creator],
+      changed_by: userMap[patient.patient?.changed_by],
+      voided_by: userMap[patient.patient?.voided_by],
       patient_id: personId,
     };
   }
@@ -171,9 +172,9 @@ export async function savePersonName(
   if (userMap) {
     for (const name of patient.names) {
       replaceColumns = {
-        given_name:name.given_name?.replace(/[^a-zA-Z ]/g, ""),
-        family_name:name.family_name?.replace(/[^a-zA-Z ]/g, ""),
-        middle_name:name.middle_name?.replace(/[^a-zA-Z ]/g, ""),
+        given_name: name.given_name?.replace(/[^a-zA-Z ]/g, ""),
+        family_name: name.family_name?.replace(/[^a-zA-Z ]/g, ""),
+        middle_name: name.middle_name?.replace(/[^a-zA-Z ]/g, ""),
         creator: userMap[name.creator],
         changed_by: userMap[name.changed_by],
         voided_by: userMap[name.voided_by],

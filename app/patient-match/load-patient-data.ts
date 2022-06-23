@@ -37,6 +37,5 @@ async function loadPatientData(patientId: number, connection: Connection) {
     names: names,
     identifiers: identifiers,
   };
-  connection.destroy();
   return results;
 }

@@ -34,7 +34,7 @@ export default class FormMapper {
         this._formMap[parseInt(key, 10)] = loadAmrsFormsIdByUuid?.form_id;
       }
     }
-
+    amrsCon.destroy();
     //console.log("Form Map", this._formMap);
   }
 

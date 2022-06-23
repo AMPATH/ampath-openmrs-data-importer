@@ -14,10 +14,10 @@ import {
 import ProviderMapper from "../providers/provider-map";
 import FormMapper from "./form-map";
 import EncounterObsMapper from "./amrs-emr-encounter-map";
-import savePatientObs, { saveObs } from "./save-obs";
+import savePatientObs, { saveObs, uuidv4 } from "./save-obs";
 import transferLocationToEmr from "../location/location";
 import { loadPatientARVPlan } from "./load-patient-obs";
-import ConceptMapper, { AmrsConceptMap } from "../concept-map";
+import { fetchPatientPrograms } from "../patients/load-patient-data";
 
 const CM = ConnectionManager.getInstance();
 
@@ -64,7 +64,9 @@ export async function saveEncounter(
   //console.log("ALL", encounter);
 
   //Perform enrollment with just one encounter once
+  let encCount = 0;
   for (const enc of Object.keys(encounter)) {
+    encCount++;
     let visitId = null;
     if (encounter[enc][0].visitId) {
       visitId = encounter[enc][0].visitId;
@@ -100,13 +102,74 @@ export async function saveEncounter(
       });
       insertMap.encounters[encounter[parseInt(enc, 0)][0].obs.encounter_id] =
         savedEncounter.insertId;
-
+      if (encCount == Object.keys(encounter).length) {
+        let dcProgramEnrolment = await fetchPatientPrograms(
+          personId,
+          amrsConnection
+        );
+        let stability = 2;
+        let a = dcProgramEnrolment.filter((x) => {
+          if (x.program_id === 9) {
+            stability = 1;
+          }
+        });
+        console.log("Stability", a, dcProgramEnrolment, stability);
+        let stabilityPayload = toInsertSql(
+          {
+            person_id: insertMap.patient,
+            concept_id: 1855,
+            encounter_id: savedEncounter.insertId,
+            order_id: 0,
+            obs_datetime: encounter[parseInt(enc, 0)][0].obs.obs_datetime,
+            location_id: 1604,
+            accession_number: "",
+            value_group_id: 0,
+            value_boolean: 0,
+            value_coded: stability,
+            value_coded_name_id: 0,
+            value_drug: undefined,
+            value_datetime: null,
+            value_numeric: null,
+            value_modifier: "",
+            value_text: "",
+            value_complex: "",
+            comments: "",
+            creator: 1,
+            date_created: encounter[parseInt(enc, 0)][0].obs.date_created,
+            voided: 0,
+            voided_by: null,
+            void_reason: "",
+            uuid: uuidv4(),
+            form_namespace_and_path: 0,
+            previous_version: "",
+            status: "",
+            interpretation: 0,
+            obs_id: 0,
+            amrs_obs_id: 0,
+          },
+          [
+            "amrs_obs_id",
+            "value_boolean",
+            "status",
+            "interpretation",
+            "obs_id",
+            "order_id",
+            "obs_group_id",
+            "previous_version",
+            "value_coded_name_id",
+          ],
+          "obs",
+          {}
+        );
+        await CM.query(stabilityPayload, kemrsConnection);
+      }
       const savedObs = await savePatientObs(
         obsToInsert,
         insertMap,
         kemrsConnection,
         savedEncounter.insertId
       );
+
       await saveEncounterProviderData(
         enc2,
         savedEncounter.insertId,
@@ -128,6 +191,7 @@ export async function saveEncounter(
       );
     }
   }
+  //CM.releaseConnections(kemrsConnection,amrsConnection)
 }
 export async function saveEncounterProviderData(
   enc: Encounter,

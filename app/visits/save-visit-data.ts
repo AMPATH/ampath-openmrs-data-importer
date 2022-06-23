@@ -55,7 +55,7 @@ export default async function saveVisitData(
       date_started: dateStarted,
       location_id: await transferLocationToEmr(encounterObject[0].location_id),
       creator: encounterObject[0].creator,
-      date_created: encounterObject[0].date_created,
+      date_created: encounterObject[0].date_created as Date,
       voided: 0,
       uuid: uuidv4(),
     };
