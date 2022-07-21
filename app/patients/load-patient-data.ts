@@ -9,6 +9,7 @@ import {
   PatientIdentifier,
   PatientProgram,
   PersonAttributeType,
+  Encounter,
 } from "../tables.types";
 import { PatientData } from "./patient-data";
 import loadPatientObs from "../encounters/load-patient-obs";
@@ -102,7 +103,7 @@ export async function fetchPersonAttributes(
 ) {
   const sql = `select * from person_attribute where person_id= ${personId} and voided=0`;
   let results: PersonAttribute[] = await CM.query(sql, connection);
-  console.log("Iman", sql, results);
+  //console.log("Iman", sql, results);
   return results;
 }
 
@@ -169,4 +170,22 @@ export function toVisitAttributeInsertStatement(
     "person_attribute_type",
     replaceColumns
   );
+}
+export async function LoadEMRenrolmentEncounter(
+  personId: any,
+  emrcon: Connection
+) {
+  const sql = `select * from encounter where patient_id= ${personId} and encounter_type=7 and voided=0`;
+  let results: Encounter = await CM.query(sql, emrcon);
+  return results;
+}
+export async function UpdateEnrollmentDate(
+  personId: any,
+  enrollment_date: string,
+  emrcon: Connection
+) {
+  const sql = `update encounter set encounter_datetime=DATE("${enrollment_date}") where patient_id= ${personId} and encounter_type=7 and voided=0`;
+  let results: Encounter = await CM.query(sql, emrcon);
+  console.log(sql, results);
+  return results;
 }

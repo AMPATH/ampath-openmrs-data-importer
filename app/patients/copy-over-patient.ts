@@ -11,7 +11,10 @@ import { InsertedMap } from "../inserted-map";
 import saveProviderData from "../providers/save-provider-data";
 import saveEncounterData from "../encounters/save-encounters";
 //import savePatientOrders from "../encounters/save-orders";
-import { saveProgramEnrolments } from "./save-program-enrolment";
+import {
+  saveProgramEnrolments,
+  updateProgramEnrollment,
+} from "./save-program-enrolment";
 import { savePatientIdentifiers } from "./save-identifiers";
 import { savePersonAttributes } from "./save-person-attribute";
 import savePatientOrders from "../encounters/save-orders";
@@ -100,7 +103,7 @@ export default async function transferPatientToAmrs(personId: number) {
         emrcon,
         amrsEmrCon
       );
-
+      await updateProgramEnrollment(personId, emrcon, amrsEmrCon);
       //console.log('saved patient',patient, saved, insertMap);
       //await savePatientObs(patient.obs, patient, insertMap, emrcon);
 

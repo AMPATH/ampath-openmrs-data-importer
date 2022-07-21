@@ -22,14 +22,14 @@ export async function fetchEncounter(
   patientId: number,
   connection: Connection
 ) {
-  const sql = `select * from encounter where patient_id= '${patientId}'`;
+  const sql = `select * from encounter where patient_id= '${patientId}' and voided = 0`;
   let results: Encounter[] = await CM.query(sql, connection);
   // console.log('encounters with uuid', results);
   return results;
 }
 export async function updateEncounterVisit(
   visitID: number,
-  encounterID:number,
+  encounterID: number,
   connection: Connection
 ) {
   const sql = `update encounter set visit_id= ${visitID} where encounter_id=${encounterID}`;

@@ -9,7 +9,17 @@ import transferLocationToEmr from "../location/location";
 import { uuidv4 } from "../encounters/save-obs";
 import moment from "moment";
 import { toEncounterInsertStatement } from "../encounters/amrs-emr-encounter-map";
-import { loadEnrolementPatientObs } from "../encounters/load-patient-obs";
+import {
+  loadEnrolementPatientObs,
+  LoadSingleHivSummary,
+} from "../encounters/load-patient-obs";
+import {
+  fetchPerson,
+  fetchPersonIdByUuid,
+  LoadEMRenrolmentEncounter,
+  UpdateEnrollmentDate,
+} from "./load-patient-data";
+import ConceptMapper from "../concept-map";
 
 const CM = ConnectionManager.getInstance();
 
@@ -169,6 +179,7 @@ export async function saveHivEnrolments(
     {}
   );
   await CM.query(patientType, connection);
+
   for (const p of enrollmentsToInsert) {
     //TODO: Determine if we should create other AMRS programs a patient was enrolled in on EMR
     if (
@@ -227,7 +238,48 @@ export async function saveProgramEnrolment(
   );
   insertMap.patientPrograms[enrolment.patient_program_id] = results.insertId;
 }
-
+export async function updateProgramEnrollment(
+  personId: any,
+  emrcon: Connection,
+  amrscon: Connection
+) {
+  // Retrieve uuid and from amrs
+  let patient: Person = await fetchPerson(personId, amrscon);
+  console.log(patient);
+  //get person from EMR db
+  let emrPersonID = await fetchPersonIdByUuid(patient.uuid, emrcon);
+  //console.log(patient,emrPersonID)
+  let hivsummary = await LoadSingleHivSummary(personId, amrscon);
+  if (hivsummary?.enrollment_date) {
+    await UpdateEnrollmentDate(
+      emrPersonID,
+      moment(hivsummary.enrollment_date).format("YYYY-MM-DD"),
+      emrcon
+    );
+    if (hivsummary.ipt_start_date) {
+      //check if already on IPT
+      let d = ConceptMapper.instance;
+      let IPTinitiation: PatientProgram = {
+        patient_id: emrPersonID,
+        program_id: 5,
+        date_enrolled: hivsummary.ipt_start_date,
+        date_completed: hivsummary.ipt_completion_date,
+        outcome_concept_id: d.amrsConceptMap[hivsummary.tb_tx_stop_reason],
+        location_id: 1604,
+        creator: 1,
+        date_created: hivsummary.ipt_start_date,
+        changed_by: undefined,
+        voided: 0,
+        voided_by: undefined,
+        date_voided: undefined,
+        void_reason: "",
+        uuid: uuidv4(),
+        patient_program_id: 0,
+      };
+      await CM.query(toEnrolmentInsertStatement(IPTinitiation, {}), emrcon);
+    }
+  }
+}
 export function toEnrolmentInsertStatement(
   enrolment: PatientProgram,
   replaceColumns?: any
