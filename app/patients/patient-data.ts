@@ -21,7 +21,7 @@ export type PatientData = {
   attributes: PersonAttribute[];
   identifiers: PatientIdentifier[];
   patientPrograms: PatientProgram[];
-  obs?: Obs[];
+  obs: Obs[];
   orders: Order[];
   visits: Visit[];
   provider: Provider;

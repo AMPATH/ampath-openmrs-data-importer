@@ -1,23 +1,12 @@
 import { Connection } from "mysql";
-import { Encounter, EncounterProvider, Obs } from "../tables.types";
+import { Encounter, EncounterProvider } from "../tables.types";
 import ConnectionManager from "../connection-manager";
 import UserMapper from "../users/user-map";
 import toInsertSql from "../prepare-insert-sql";
 import { InsertedMap } from "../inserted-map";
-import {
-  fetchAmrsEncounterType,
-  fetchEncounter,
-  fetchEncounterProviders,
-  fetchEncounterType,
-  fetchKemrEncounterById,
-} from "./load-encounters";
+import { fetchEncounterProviders } from "./load-encounters";
 import ProviderMapper from "../providers/provider-map";
 import FormMapper from "./form-map";
-import EncounterObsMapper from "./amrs-emr-encounter-map";
-import savePatientObs, { saveObs, uuidv4 } from "./save-obs";
-import transferLocationToEmr from "../location/location";
-import { loadPatientARVPlan } from "./load-patient-obs";
-import { fetchPatientPrograms } from "../patients/load-patient-data";
 
 const CM = ConnectionManager.getInstance();
 
@@ -51,148 +40,21 @@ export async function saveEncounter(
   encounterType: number,
   userMap?: any
 ) {
-  let replaceColumns = {};
+  let replaceColumns = { patient_id: insertMap.patient };
   // Map encounter to respective kenyaemr encounters and forms
-  let encounterObsMapper = new EncounterObsMapper();
-  let encounter: any = await encounterObsMapper.retrieveobs(
-    personId,
-    amrsConnection,
-    kemrsConnection,
-    insertMap,
-    encounterType
-  );
+
   //console.log("ALL", encounter);
 
   //Perform enrollment with just one encounter once
   let encCount = 0;
-  for (const enc of Object.keys(encounter)) {
-    encCount++;
-    let visitId = null;
-    if (encounter[enc][0].visitId) {
-      visitId = encounter[enc][0].visitId;
-    }
-    if (enc !== "0") {
-      let enc2 = await fetchKemrEncounterById(parseInt(enc, 0), amrsConnection);
-      if (userMap) {
-        let metadata: any = findDominantEncType(encounter[parseInt(enc, 0)]);
-        replaceColumns = {
-          creator: userMap[encounter[parseInt(enc, 0)][0].obs.creator],
-          changed_by: userMap[encounter[parseInt(enc, 0)][0].obs.changed_by]
-            ? userMap[encounter[parseInt(enc, 0)][0].obs.changed_by]
-            : null,
-          voided_by: userMap[encounter[parseInt(enc, 0)][0].obs.voided_by],
-          encounter_type: metadata[0],
-          form_id: metadata[1],
-          visit_id: null,
-          location_id: await transferLocationToEmr(
-            encounter[parseInt(enc, 0)][0].locationId
-          ),
-          patient_id: insertMap.patient,
-        };
-        console.log(replaceColumns, enc2[0]);
-      }
-      const savedEncounter = await CM.query(
-        toEncounterInsertStatement(enc2[0], replaceColumns),
-        kemrsConnection
-      );
-
-      let obsToInsert: Obs[] = [];
-      encounter[parseInt(enc, 0)].map((a: any) => {
-        obsToInsert.push(a.obs);
-      });
-      insertMap.encounters[encounter[parseInt(enc, 0)][0].obs.encounter_id] =
-        savedEncounter.insertId;
-      if (encCount == Object.keys(encounter).length) {
-        let dcProgramEnrolment = await fetchPatientPrograms(
-          personId,
-          amrsConnection
-        );
-        let stability = 2;
-        let a = dcProgramEnrolment.filter((x) => {
-          if (x.program_id === 9) {
-            stability = 1;
-          }
-        });
-        console.log("Stability", a, dcProgramEnrolment, stability);
-        let stabilityPayload = toInsertSql(
-          {
-            person_id: insertMap.patient,
-            concept_id: 1855,
-            encounter_id: savedEncounter.insertId,
-            order_id: 0,
-            obs_datetime: encounter[parseInt(enc, 0)][0].obs.obs_datetime,
-            location_id: 1604,
-            accession_number: "",
-            value_group_id: 0,
-            value_boolean: 0,
-            value_coded: stability,
-            value_coded_name_id: 0,
-            value_drug: undefined,
-            value_datetime: null,
-            value_numeric: null,
-            value_modifier: "",
-            value_text: "",
-            value_complex: "",
-            comments: "",
-            creator: 1,
-            date_created: encounter[parseInt(enc, 0)][0].obs.date_created,
-            voided: 0,
-            voided_by: null,
-            void_reason: "",
-            uuid: uuidv4(),
-            form_namespace_and_path: 0,
-            previous_version: "",
-            status: "",
-            interpretation: 0,
-            obs_id: 0,
-            amrs_obs_id: 0,
-          },
-          [
-            "amrs_obs_id",
-            "value_boolean",
-            "status",
-            "interpretation",
-            "obs_id",
-            "order_id",
-            "obs_group_id",
-            "previous_version",
-            "value_coded_name_id",
-          ],
-          "obs",
-          {}
-        );
-        await CM.query(stabilityPayload, kemrsConnection);
-      }
-      const savedObs = await savePatientObs(
-        obsToInsert,
-        insertMap,
-        kemrsConnection,
-        savedEncounter.insertId
-      );
-
-      await saveEncounterProviderData(
-        enc2,
-        savedEncounter.insertId,
-        amrsConnection,
-        userMap
-      );
-    } else {
-      //save obs without encounters
-      let obsToInsert: Obs[] = [];
-      encounter[parseInt(enc, 0)].map((a: any) => {
-        obsToInsert.push(a.obs);
-      });
-
-      const savedObsWithoutEncounter = await savePatientObs(
-        obsToInsert,
-        insertMap,
-        kemrsConnection,
-        null
-      );
-    }
+  for (const enc of _encounter) {
+    await CM.query(
+      toEncounterInsertStatement(enc, replaceColumns),
+      kemrsConnection
+    );
   }
-  //CM.releaseConnections(kemrsConnection,amrsConnection)
 }
+//CM.releaseConnections(kemrsConnection,amrsConnection)
 export async function saveEncounterProviderData(
   enc: Encounter,
   encounterId: number,

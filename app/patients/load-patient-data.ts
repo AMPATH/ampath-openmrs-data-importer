@@ -38,7 +38,7 @@ export default async function loadPatientData(
   let names = await fetchPersonNames(patientId, connection);
   let attributes = await fetchPersonAttributes(patientId, connection);
   let identifiers = await fetchPersonIdentifiers(patientId, connection);
-  let obs = [{}];
+  let obs = await loadPatientObs(patientId, connection);
   let visits = await loadVisitData(patientId, connection);
   let orders = await loadPatientOrders(patientId, connection);
   let provider = await fetchProvider(patientId, connection);
@@ -54,6 +54,7 @@ export default async function loadPatientData(
     patientPrograms: patientPrograms,
     orders: orders,
     visits: visits,
+    obs: obs,
     provider: provider,
     encounter: encounters,
   };
@@ -120,7 +121,7 @@ export async function fetchPatientPrograms(
   personId: number,
   connection: Connection
 ) {
-  const sql = `select * from amrs.patient_program where patient_id= ${personId} and voided=0`;
+  const sql = `select * from kenya_emr1.patient_program where patient_id= ${personId} and voided=0`;
   let results: PatientProgram[] = await CM.query(sql, connection);
   return results;
 }

@@ -1,4 +1,5 @@
 import mysql from "mysql";
+import fs from "fs";
 
 export default function toInsertSql(
   obj: any,
@@ -19,6 +20,15 @@ export default function toInsertSql(
   }
   const sql = mysql.format(`insert INTO ${table} SET ?`, [set]);
   console.log("SQL::: ", sql);
+  const filePath = "sql.txt";
+
+  fs.appendFile(filePath, sql + "\n", (err) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
+    console.log("File written successfully!");
+  });
   return sql;
 }
 

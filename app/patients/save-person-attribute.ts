@@ -16,25 +16,21 @@ export async function savePersonAttributes(
 ) {
   await UserMapper.instance.initialize();
   for (const attribute of patient.attributes) {
-    let replaceColumns = {};
-    //Create attribute type if missing
-    let attributeID = await fetchorCreatePersonAttributeTypes(
-      AmrsConnection,
-      EmrConnection,
-      attribute.person_attribute_type_id
-    );
-    console.log(
-      "Attribute ID",
-      attributeID,
-      attribute.person_attribute_type_id
-    );
-    let userMap=UserMapper.instance.userMap;
-    replaceColumns = {
+    // let replaceColumns = {};
+    // //Create attribute type if missing
+    // let attributeID = await fetchorCreatePersonAttributeTypes(
+    //   AmrsConnection,
+    //   EmrConnection,
+    //   attribute.person_attribute_type_id
+    // );
+    // console.log(
+    //   "Attribute ID",
+    //   attributeID,
+    //   attribute.person_attribute_type_id
+    // );
+    // let userMap=UserMapper.instance.userMap;
+    let replaceColumns = {
       person_id: insertMap.patient,
-      person_attribute_type_id: attributeID,
-      creator: userMap[attribute.creator],
-      changed_by: userMap[attribute.changed_by],
-      voided_by: userMap[attribute.voided_by],
     };
     await CM.query(
       toPatientAttributeInsertStatement(attribute, replaceColumns),
@@ -59,11 +55,10 @@ export function toPatientAttributeUpdateStatement(
   attribute: PersonAttribute,
   replaceColumns?: any
 ) {
-  return toUpdateSql(
+  return toInsertSql(
     attribute,
     ["person_attribute_id"],
     "person_attribute",
-    "person_attribute_id",
     replaceColumns
   );
 }

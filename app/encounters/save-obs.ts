@@ -1,37 +1,37 @@
 import ConnectionManager from "../connection-manager";
 import UserMapper from "../users/user-map";
-import ConceptMapper, { AmrsConceptMap, ConceptMap } from "../concept-map";
+import ConceptMapper, { ConceptMap } from "../concept-map";
 import { Connection } from "mysql";
 import { Obs } from "../tables.types";
+import { PatientData } from "../patients/patient-data";
 import toInsertSql from "../prepare-insert-sql";
 import { InsertedMap } from "../inserted-map";
 import { OrderMap } from "./save-orders";
 import * as skipObs from "../../metadata/skip-obs.json";
 import * as DM from "../../metadata/data-type-map.json";
-import transferLocationToEmr from "../location/location";
 const dataTypeMapping: DataTypeTransformMap = DM as DataTypeTransformMap;
 const CM = ConnectionManager.getInstance();
 
 export default async function savePatientObs(
   obsToInsert: Obs[],
+  patient: PatientData,
   insertMap: InsertedMap,
-  connection: Connection,
-  encounter: any
+  connection: Connection
 ) {
   await ConceptMapper.instance.initialize();
   await UserMapper.instance.initialize();
-  let obs = prepareObs(obsToInsert, ConceptMapper.instance);
+  //let obs = prepareObs(obsToInsert, ConceptMapper.instance);
   let map = await saveObs(
-    obs,
+    obsToInsert,
     obsToInsert,
     insertMap.patient,
-    encounter,
+    insertMap.encounters,
     insertMap.orders,
     connection
   );
   insertMap.obs = map;
-  //await updateObsGroupIds(obsToInsert, insertMap, connection);
-  //connection.destroy()
+  // console.log(insertMap);
+  await updateObsGroupIds(obsToInsert, insertMap, connection);
 }
 
 export type ObsMap = {
@@ -40,13 +40,32 @@ export type ObsMap = {
 
 export async function updateObsGroupIds(
   sourceObs: Obs[],
-  _insertMap: InsertedMap,
+  insertMap: InsertedMap,
   connection: Connection
 ) {
   sourceObs.forEach(async (obs) => {
     if (obs.obs_group_id) {
+      if (!insertMap.obs[obs.obs_group_id]) {
+        console.warn(
+          "Parent obs id is missing from the insert map. Skipping updating of obs_group_id.",
+          obs.obs_group_id
+        );
+        // console.warn('Details:', obs);
+        return; // TODO throw error instead of returning
+      }
+
+      if (!obs.amrs_obs_id) {
+        console.warn(
+          "Obs was not inserted in AMRS. Skipping updates. Details:",
+          obs
+        );
+        return; // TODO throw error instead of returning
+      }
       await CM.query(
-        toObsGroupIdUpdateStatement(obs.obs_id, obs.obs_group_id),
+        toObsGroupIdUpdateStatement(
+          obs.amrs_obs_id,
+          insertMap.obs[obs.obs_group_id]
+        ),
         connection
       );
     }
@@ -63,48 +82,14 @@ export async function saveObs(
 ) {
   let obsMap: ObsMap = {};
   let skippedObsCount = 0;
-  let concept_id: any = [];
-  let value_coded: any = [];
   for (var i = 0; i < mappedObs.length; i++) {
-    //Check if the concept id or value_coded exist
-    if (
-      mappedObs[i].value_coded != null ||
-      mappedObs[i].value_coded != undefined
-    ) {
-      value_coded = await CM.query(
-        `Select concept_id from concept where concept_id=${mappedObs[i].value_coded}`,
-        connection
-      );
-      if (!value_coded[0]?.concept_id) {
-        mappedObs[i].value_coded = 1067;
-      }
-    }
-    concept_id = await CM.query(
-      `Select concept_id from concept where concept_id=${mappedObs[i].concept_id}`,
-      connection
-    );
-    console.log("checking", concept_id, mappedObs[i]);
-    if (concept_id[0]?.concept_id < 0) {
-      console.log(
-        "Concept id",
-        concept_id[0].concept_id,
-        mappedObs[i].concept_id
-      );
-      mappedObs[i].concept_id = 1067;
-    }
-    mappedObs[i].value_drug = null;
-
-    if (
-      mappedObs[i].comments === "invalid" ||
-      mappedObs[i].concept_id == 1067 ||
-      mappedObs[i].value_coded == 1067
-    ) {
+    if (mappedObs[i].comments === "invalid") {
       // skip it
       console.warn("skipping obs for concept: ", sourceObs[i].concept_id);
       skippedObsCount++;
       continue;
     }
-    const sql = await toObsInsertStatement(
+    const sql = toObsInsertStatement(
       mappedObs[i],
       sourceObs[i],
       newPatientId,
@@ -121,7 +106,7 @@ export async function saveObs(
   return obsMap;
 }
 
-export async function toObsInsertStatement(
+export function toObsInsertStatement(
   obs: Obs,
   sourceObs: Obs,
   newPatientId: number,
@@ -138,18 +123,17 @@ export async function toObsInsertStatement(
     creator: userMap[sourceObs.creator],
     voided_by: userMap[sourceObs.voided_by],
     person_id: newPatientId,
-    encounter_id: encounterMap || null,
-    location_id: await transferLocationToEmr(sourceObs.location_id), //TODO replace with kapenguria location id,
+    encounter_id: encounterMap[sourceObs.encounter_id] || null,
+    location_id: 214, //TODO replace with kapenguria location id,
     order_id: orderMap[sourceObs.order_id] || null,
-    //status: "FINAL",
+    status: "FINAL",
     obs_group_id: null,
     value_coded_name_id: null, //TODO replace with value_coded_name_id
     previous_version: null, //TODO replace with previous_version
-    uuid: uuidv4(), //Remove this uuid
   };
   return toInsertSql(
     obs,
-    ["amrs_obs_id", "value_boolean", "status", "interpretation", "obs_id"],
+    ["obs_id", "amrs_obs_id", "value_boolean", "status", "interpretation"],
     "obs",
     replaceColumns
   );
@@ -168,7 +152,7 @@ export function prepareObs(
   // replace concept ids with maps and convert to destination concept values
   // if a missing concept map or unknown data type concept is detected, then throw error
   let obs: Obs[] = obsToInsert.reduce<Obs[]>((filtered, o): Obs[] => {
-    let obsId = o.obs_id?.toString();
+    let obsId = o.obs_id.toString();
     if ((skipObs as any)[obsId]) {
       console.log("Skipping obs", (skipObs as any)[obsId]);
       return filtered;
@@ -176,21 +160,19 @@ export function prepareObs(
     let newObs: Obs = Object.assign({}, o);
     // try {
     // TODO, to remove this before moving running in production
-    //assertObsConceptsAreMapped(o, conceptMap.conceptMap);
+    assertObsConceptsAreMapped(o, conceptMap.conceptMap);
     if (dataTypeMapping[o.concept_id]) {
       // a map is provided to handle concept and type transformations
       transformObsConcept(dataTypeMapping[o.concept_id], newObs, o);
     } else {
-      mapObsConcept(newObs, o, conceptMap.amrsConceptMap);
-      mapObsValue(newObs, o, conceptMap.amrsConceptMap);
+      mapObsConcept(newObs, o, conceptMap.conceptMap);
+      //mapObsValue(newObs, o, conceptMap.conceptMap);
     }
     // } catch (err) {
     //   // console.warn('Error:', err);
     //   newObs.comments = "invalid";
     // }
-    if (newObs.concept_id) {
-      filtered.push(newObs);
-    }
+    filtered.push(newObs);
     return filtered;
   }, []);
 
@@ -203,15 +185,12 @@ export function assertObsConceptsAreMapped(obs: Obs, conceptMap: ConceptMap) {
     return;
   }
   if (!conceptMap[obs.concept_id]) {
-    console.log("Unmapped concept detected. Concept ID: " + obs.concept_id);
+    throw new Error("Unmapped concept detected. Concept ID: " + obs.concept_id);
   }
 
   if (obs.value_coded && !conceptMap[obs.value_coded]) {
-    // throw new Error(
-    //   "Unmapped value_coded concept detected. Concept ID: " + obs.value_coded
-    // );
-    console.log(
-      "Unmapped value coded concept detected. Concept ID: " + obs.concept_id
+    throw new Error(
+      "Unmapped value_coded concept detected. Concept ID: " + obs.value_coded
     );
   }
 }
@@ -228,30 +207,21 @@ export function transformObsConcept(
 export function mapObsConcept(
   newObs: Obs,
   sourceObs: Obs,
-  conceptMap: AmrsConceptMap
+  conceptMap: ConceptMap
 ) {
-  //console.log("Mapping", sourceObs,conceptMap[sourceObs.concept_id])
-  if (conceptMap[sourceObs.concept_id] !== undefined) {
-    newObs.concept_id = parseInt(
-      conceptMap[sourceObs.concept_id]?.toString(),
-      0
-    );
-  }
+  //newObs.concept_id = parseInt(conceptMap[sourceObs.concept_id].amrs_id);
 }
 
-export function mapObsValue(
-  newObs: Obs,
-  sourceObs: Obs,
-  conceptMap: AmrsConceptMap
-) {
-  let foundConcept: any = conceptMap[sourceObs.concept_id];
-  console.log("Before", foundConcept);
-  if (foundConcept && areDatatypeEquivalent(foundConcept[0])) {
-    mapMatchingTypeObsValue(newObs, sourceObs, conceptMap);
-  } else {
-    //throw new Error("Unresolved conflicting data types detected. Details: ");
-  }
-}
+// export function mapObsValue(
+//   newObs: Obs,
+//   sourceObs: Obs,
+//   conceptMap: ConceptMap
+// ) {
+//   let foundConcept = conceptMap[sourceObs.concept_id];
+//   if (areDatatypeEquivalent(foundConcept)) {
+//     mapMatchingTypeObsValue(newObs, sourceObs, conceptMap);
+//   }
+// }
 
 export type DataTypeTransformMap = {
   [conceptId: string]: DataTypeTransformInfo;
@@ -272,13 +242,9 @@ export function transformObsValue(
 ) {
   switch (transformInfo.type) {
     case "coded-coded":
-      if (
-        sourceObs.value_coded.toString() !== "-" &&
-        transformInfo.values[sourceObs.value_coded] === undefined
-      ) {
-        console.log(transformInfo.values);
+      if (transformInfo.values[sourceObs.value_coded] === undefined) {
         throw new Error(
-          `Unresolved transformation for value coded ${sourceObs.value_coded}. Details ${transformInfo.values}`
+          `Unresolved transformation for value ${sourceObs.value_coded}. Details ${transformInfo}`
         );
       }
       newObs.value_coded = parseInt(
@@ -286,12 +252,9 @@ export function transformObsValue(
       );
       break;
     case "numeric-coded":
-      if (
-        sourceObs.value_coded.toString() !== "-" &&
-        transformInfo.values[sourceObs.value_numeric || ""] === undefined
-      ) {
+      if (transformInfo.values[sourceObs.value_numeric || ""] === undefined) {
         throw new Error(
-          `Unresolved transformation for value numeric ${sourceObs.value_numeric}. Details ${transformInfo}`
+          `Unresolved transformation for value ${sourceObs.value_numeric}. Details ${transformInfo}`
         );
       }
       newObs.value_coded = parseInt(
@@ -304,44 +267,34 @@ export function transformObsValue(
   }
 }
 
-export function areDatatypeEquivalent(foundConcept: any): boolean {
-  if (foundConcept?.datatype === foundConcept?.amrs_datatype) {
-    return true;
-  }
+// export function areDatatypeEquivalent(foundConcept: FoundConcept): boolean {
+//   if (foundConcept.datatype === foundConcept.amrs_datatype) {
+//     return true;
+//   }
 
-  if (
-    foundConcept?.datatype === "Datetime" &&
-    foundConcept?.amrs_datatype === "Date"
-  ) {
-    return true;
-  }
+//   if (
+//     foundConcept.datatype === "Datetime" &&
+//     foundConcept.amrs_datatype === "Date"
+//   ) {
+//     return true;
+//   }
 
-  if (
-    foundConcept?.datatype === "Date" &&
-    foundConcept?.amrs_datatype === "Datetime"
-  ) {
-    return true;
-  }
+//   if (
+//     foundConcept.datatype === "Date" &&
+//     foundConcept.amrs_datatype === "Datetime"
+//   ) {
+//     return true;
+//   }
 
-  return false;
-}
+//   return false;
+// }
 
 function mapMatchingTypeObsValue(
   newObs: Obs,
   sourceObs: Obs,
-  conceptMap: AmrsConceptMap
+  conceptMap: ConceptMap
 ) {
   if (sourceObs.value_coded) {
-    let a: any = conceptMap[sourceObs.value_coded];
-    if (a && Number.isInteger(a[0])) {
-      newObs.value_coded = parseInt(a[0]?.toString());
-    }
+    //newObs.value_coded = parseInt(conceptMap[sourceObs.value_coded].amrs_id);
   }
-}
-export function uuidv4() {
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-    var r = (Math.random() * 16) | 0,
-      v = c == "x" ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
 }

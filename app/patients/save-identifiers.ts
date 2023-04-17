@@ -12,6 +12,7 @@ const CM = ConnectionManager.getInstance();
 export const KenyaEMR_CCC_ID = 6; // TODO map to the right identifier types
 export const AMR_CCC_ID = 1;
 export const AMR_HEI_ID = 38;
+export const AMR_PREP_ID = 44;
 export const EMR_HEI_ID = 7;
 export const KenyaEMR_National_ID = 8;
 export const AMRS_National_ID = 5;
@@ -30,7 +31,7 @@ export async function savePatientIdentifiers(
   connection: Connection
 ) {
   const a = await handleAmrsIdentifiers(identifiersToSave);
-  await saveKnownIdentifiers(a, insertMap, connection);
+  await saveKnownIdentifiers(identifiersToSave, insertMap, connection);
 }
 
 export async function saveKnownIdentifiers(
@@ -67,6 +68,9 @@ function handleAmrsIdentifiers(identifiers: PatientIdentifier[]) {
       case AMR_HEI_ID:
         handleHEIId(newId);
         break;
+      case AMR_PREP_ID:
+        handlePrepId(newId);
+        break;
       default:
         continue;
     }
@@ -101,7 +105,9 @@ export function handleOLDKenyaEmrId(identifier: PatientIdentifier) {
 export function handleHEIId(identifier: PatientIdentifier) {
   identifier.identifier_type = 7;
 }
-
+export function handlePrepId(identifier: PatientIdentifier) {
+  identifier.identifier_type = 16;
+}
 export async function saveIdentifier(
   identifier: PatientIdentifier,
   insertMap: InsertedMap,
@@ -112,10 +118,6 @@ export async function saveIdentifier(
   let replaceColumns = {};
   if (userMap) {
     replaceColumns = {
-      creator: userMap[identifier.creator],
-      changed_by: userMap[identifier.changed_by],
-      voided_by: userMap[identifier.voided_by],
-      location_id: await transferLocationToEmr(identifier.location_id), //TODO replace with actual location
       patient_id: insertMap.patient,
     };
   }

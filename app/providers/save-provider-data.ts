@@ -35,9 +35,6 @@ export async function saveProvider(
   let replaceColumns = {};
   if (userMap) {
     replaceColumns = {
-      creator: userMap[provider.creator],
-      changed_by: userMap[provider.changed_by],
-      voided_by: userMap[provider.retired_by],
       person_id: insertMap.patient,
     };
   }

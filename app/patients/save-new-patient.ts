@@ -3,7 +3,7 @@ import { Person, Patient, Address, PersonName } from "../tables.types";
 import { PatientData } from "./patient-data";
 import ConnectionManager from "../connection-manager";
 import UserMapper from "../users/user-map";
-import toInsertSql, { toUpdateSql } from "../prepare-insert-sql";
+import toInsertSql from "../prepare-insert-sql";
 import { InsertedMap } from "../inserted-map";
 
 const CM = ConnectionManager.getInstance();
@@ -55,9 +55,6 @@ export async function savePatient(
   console.log(patient);
   if (userMap) {
     replaceColumns = {
-      creator: userMap[patient.patient?.creator],
-      changed_by: userMap[patient.patient?.changed_by],
-      voided_by: userMap[patient.patient?.voided_by],
       patient_id: personId,
     };
   }
@@ -95,34 +92,10 @@ export async function savePersonAddress(
       address6: patient.address.address6, //Location,
       address5: patient.address.address5, //Sub Location,
     };
-    if (
-      !updateStatement ||
-      (insertMap.personAddress &&
-        insertMap.personAddress[patient.address.person_address_id] ===
-          undefined)
-    ) {
-      await CM.query(
-        toPersonAddressInsertStatement(patient.address, replaceColumns),
-        connection
-      );
-    } else if (
-      insertMap.personAddress &&
-      insertMap.personAddress[patient.address.person_address_id]
-    ) {
-      replaceColumns = {
-        ...replaceColumns,
-        person_address_id:
-          insertMap.personAddress[patient.address.person_address_id],
-      };
-      await CM.query(
-        toPersonAddressUpdateStatement(patient.address, replaceColumns),
-        connection
-      );
-    } else {
-      throw new Error(
-        "Updating address failed. person_address_id missing from the insert map."
-      );
-    }
+    await CM.query(
+      toPersonAddressInsertStatement(patient.address, {}),
+      connection
+    );
   }
 }
 
@@ -153,11 +126,10 @@ export function toPersonAddressUpdateStatement(
   personAddress: Address,
   replaceColumns?: any
 ) {
-  return toUpdateSql(
+  return toInsertSql(
     personAddress,
     ["person_address_id"],
     "person_address",
-    "person_address_id",
     replaceColumns
   );
 }
@@ -172,12 +144,6 @@ export async function savePersonName(
   if (userMap) {
     for (const name of patient.names) {
       replaceColumns = {
-        given_name: name.given_name?.replace(/[^a-zA-Z ]/g, ""),
-        family_name: name.family_name?.replace(/[^a-zA-Z ]/g, ""),
-        middle_name: name.middle_name?.replace(/[^a-zA-Z ]/g, ""),
-        creator: userMap[name.creator],
-        changed_by: userMap[name.changed_by],
-        voided_by: userMap[name.voided_by],
         person_id: insertMap.patient,
       };
       await CM.query(

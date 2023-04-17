@@ -30,7 +30,7 @@ async function start(action: string, start: string, end: string) {
       } else {
         failed++;
         let msg = status.message as string;
-        console.log("================   " + msg +"+++" +patient);
+        console.log("================   " + msg + "+++" + patient);
         // if (msg.includes("for key 'uuid'") && msg.includes("Duplicate entry")) {
         //   let err = {
         //     patientId: patient,
@@ -40,12 +40,12 @@ async function start(action: string, start: string, end: string) {
         // } else {
         //   break;
         // }
-       // await writeCsv(pathtoError, [{id:"patient",title:'Person ID'}], patient)
+        // await writeCsv(pathtoError, [{id:"patient",title:'Person ID'}], patient)
       }
       console.log("========end==========");
     }
-  }else{
-    let saveVisit = saveVisitData(emrcon,102);
+  } else {
+    //let saveVisit = saveVisitData(emrcon,102);
   }
 
   let header = [

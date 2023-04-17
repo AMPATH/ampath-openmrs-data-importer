@@ -172,7 +172,7 @@ export type Obs = {
   interpretation: number;
 };
 export type Visit = {
-  visit_id?: number;
+  visit_id: number;
   patient_id: number;
   visit_type_id: number;
   date_started: Date;
