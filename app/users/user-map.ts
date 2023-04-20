@@ -29,14 +29,14 @@ export default class UserMapper {
     const loadKemrUsers = await fetchUsers(kenyaEmrCon);
     const loadAmrsUsers = await fetchUsers(amrsCon);
     for (const kusers of loadAmrsUsers) {
-      // let emrUserID = loadKemrUsers.find((user) => user.uuid === kusers.uuid)
-      //   ?.user_id;
-      let emrUserID = 1;
+      let emrUserID = loadKemrUsers.find((user) => user.uuid === kusers.uuid)
+        ?.user_id;
+      //let emrUserID = 2;
       let amrsUserId = kusers.user_id;
       this._userArray.push({ amrsUserId, emrUserID });
-      //if (emrUserID) {
-        this._userMap[amrsUserId] = 1;
-     // }
+      if (emrUserID) {
+        this._userMap[amrsUserId] = emrUserID;
+      }
     }
     console.log("User Array", this._userArray);
   }

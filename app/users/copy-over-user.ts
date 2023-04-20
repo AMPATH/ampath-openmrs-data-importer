@@ -5,7 +5,7 @@ import loadPatientData, {
   fetchPerson,
   loadPatientDataByUuid,
 } from "../patients/load-patient-data";
-import { savePerson } from "../patients/save-new-patient";
+import { savePerson, savePersonName } from "../patients/save-new-patient";
 import UserMapper from "./user-map";
 
 const CM = ConnectionManager.getInstance();
@@ -33,18 +33,23 @@ export default async function transferUserToEmr(userId: number) {
         patient.person.uuid,
         kenyaEmrCon
       );
-      console.log("saved person", savedPerson);
+      let insertMap: any = {};
+      insertMap.patient = savedPerson.person.person_id;
+      console.log("saved person", patient);
+      await savePersonName(patient, insertMap, kenyaEmrCon);
       //prepare payload for userdata with new id
       userData.user.person_id = savedPerson.person.person_id;
       await saveUserData(userData, kenyaEmrCon);
       const saved = await loadUserDataByUuid(userData.user.uuid, kenyaEmrCon);
       console.log("saved user", saved);
-      await CM.rollbackTransaction(kenyaEmrCon);
+
       const commitedUser = await loadUserDataByUuid(
         userData.user.uuid,
         kenyaEmrCon
       );
+
       console.log("commited user", commitedUser);
+      await CM.commitTransaction(kenyaEmrCon);
       CM.releaseConnections(kenyaEmrCon, amrsCon);
       return saved.user.user_id;
     } catch (err) {

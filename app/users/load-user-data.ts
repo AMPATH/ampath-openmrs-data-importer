@@ -39,7 +39,7 @@ export async function fetchUserByUuid(
   personUuid: string,
   connection: Connection
 ) {
-  const sql = `select user_id from users where uuid= '${personUuid}'`;
+  const sql = `select * from users where uuid= '${personUuid}'`;
   let results: any[] = await con.query(sql, connection);
   console.log("user with uuid", results);
   return results.length > 0 ? (results[0]["user_id"] as number) : -1;

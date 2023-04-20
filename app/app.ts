@@ -1,7 +1,9 @@
 import ConnectionManager from "./connection-manager";
+import { fetchDestinationLocationId } from "./patient-match/patient-encounter-location";
 import transferPatientToAmrs from "./patients/copy-over-patient";
 import saveVisitData from "./visits/save-visit-data";
 import writeCsv from "./write-csv";
+import fs from "fs";
 const CM = ConnectionManager.getInstance();
 const readCSV = require("./read-csv");
 const patientIdsPath = "metadata/patient_ids.csv";
@@ -12,9 +14,15 @@ console.log("Starting application..");
 
 async function start(action: string, start: string, end: string) {
   console.log("ACtion", action);
+  let destinationConnection = await CM.getConnectionKenyaemr();
+  //Set Destination location ID;
+  let destinationLocationID = await fetchDestinationLocationId(
+    "e8d6a488-94af-4526-80c2-886c41ee4ed4",
+    destinationConnection
+  );
   const patientIds = await readCSV(patientIdsPath);
   const patients = patientIds.array.map((p: any) => p.patient_id);
-  let emrcon = await CM.getConnectionKenyaemr();
+
   //const existingPatientsIds = await readCSV(existingPatientIdsPath);
   let synced = 0;
   let failed = 0;
@@ -24,23 +32,21 @@ async function start(action: string, start: string, end: string) {
   if (action && action === "create") {
     for (const patient of patientsToTransfer) {
       console.log("=======start===========");
-      let status = await transferPatientToAmrs(patient);
+      let status = await transferPatientToAmrs(patient, destinationLocationID);
       if (status.synced) {
         synced++;
       } else {
         failed++;
         let msg = status.message as string;
         console.log("================   " + msg + "+++" + patient);
-        // if (msg.includes("for key 'uuid'") && msg.includes("Duplicate entry")) {
-        //   let err = {
-        //     patientId: patient,
-        //     encProvUuid: msg.substr(31, 36),
-        //   };
-        //   encProvErrors.push(err);
-        // } else {
-        //   break;
-        // }
-        // await writeCsv(pathtoError, [{id:"patient",title:'Person ID'}], patient)
+        fs.appendFile("failed.txt", patient + "\n", (err) => {
+          if (err) {
+            console.error(err);
+            return;
+          }
+          console.log("File written successfully!");
+        });
+        //await writeCsv(pathtoError, [{id:"patient",title:'patient'}], patient)
       }
       console.log("========end==========");
     }

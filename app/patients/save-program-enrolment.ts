@@ -32,15 +32,22 @@ export async function saveProgramEnrolments(
   enrollmentsToInsert: PatientProgram[],
   patient: PatientData,
   insertMap: InsertedMap,
-  connection: Connection
+  connection: Connection,
+  locationId: any
 ) {
-  await saveHivEnrolments(enrollmentsToInsert, insertMap, connection);
+  await saveHivEnrolments(
+    enrollmentsToInsert,
+    insertMap,
+    connection,
+    locationId
+  );
 }
 
 export async function saveHivEnrolments(
   enrollmentsToInsert: PatientProgram[],
   insertMap: InsertedMap,
-  connection: Connection
+  connection: Connection,
+  locationId: any
 ) {
   // create enrolment encounter
   //   encounterObs.encounterTypeUuid =
@@ -52,7 +59,13 @@ export async function saveHivEnrolments(
 
   for (const p of enrollmentsToInsert) {
     //TODO: Determine if we should create other AMRS programs a patient was enrolled in on EMR
-    await saveProgramEnrolment(p, EMR_OVC_Program, insertMap, connection);
+    await saveProgramEnrolment(
+      p,
+      EMR_OVC_Program,
+      insertMap,
+      connection,
+      locationId
+    );
   }
 }
 
@@ -60,7 +73,8 @@ export async function saveProgramEnrolment(
   enrolment: PatientProgram,
   programId: number,
   insertMap: InsertedMap,
-  connection: Connection
+  connection: Connection,
+  locationId: any
 ) {
   // console.log("user person id", personId);
   const userMap = UserMapper.instance.userMap;
@@ -69,6 +83,8 @@ export async function saveProgramEnrolment(
     replaceColumns = {
       //TODO replace with actual location
       patient_id: insertMap.patient,
+      location_id: locationId,
+      creator: 2,
     };
   }
   const results = await CM.query(

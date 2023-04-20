@@ -22,11 +22,16 @@ export async function savePerson(
   userMap?: any
 ) {
   let replaceColumns = {};
+
   if (userMap) {
     replaceColumns = {
       creator: userMap[patient.person.creator],
-      changed_by: userMap[patient.person.changed_by],
-      voided_by: userMap[patient.person.voided_by],
+      changed_by: patient.person.changed_by
+        ? userMap[patient.person.changed_by]
+        : null,
+      voided_by: patient.person.changed_by
+        ? userMap[patient.person.voided_by]
+        : null,
     };
   }
   //await CM.query("SET FOREIGN_KEY_CHECKS = 0", connection);
@@ -56,6 +61,13 @@ export async function savePatient(
   if (userMap) {
     replaceColumns = {
       patient_id: personId,
+      creator: userMap[patient.address.creator],
+      changed_by: patient.address.changed_by
+        ? userMap[patient.address.changed_by]
+        : null,
+      voided_by: patient.address.voided_by
+        ? userMap[patient.address.voided_by]
+        : null,
     };
   }
   await CM.query(
@@ -78,22 +90,23 @@ export async function savePersonAddress(
 ) {
   let replaceColumns = {};
   const userMap = UserMapper.instance.userMap;
+  console.log("Address user map", userMap);
   if (userMap && patient.address) {
     replaceColumns = {
-      creator: userMap[patient.address.creator],
-      changed_by: userMap[patient.address.changed_by],
-      voided_by: userMap[patient.address.voided_by],
+      creator: userMap[patient.address.creator]
+        ? userMap[patient.address.creator]
+        : 2,
+      changed_by: userMap[patient.address.changed_by]
+        ? userMap[patient.address.changed_by]
+        : 2,
+      voided_by: patient.address.voided_by
+        ? userMap[patient.address.voided_by]
+        : 2,
       person_id: insertMap.patient,
-      address1: patient.address.county_district, //County
-      city_village: patient.address.city_village, //County
-      address2: patient.address.address2, //Landmark
-      address3: patient.address.address3, //Landmark
-      address4: patient.address.address4, //Landmark
-      address6: patient.address.address6, //Location,
-      address5: patient.address.address5, //Sub Location,
     };
+    console.log("replace", replaceColumns);
     await CM.query(
-      toPersonAddressInsertStatement(patient.address, {}),
+      toPersonAddressInsertStatement(patient.address, replaceColumns),
       connection
     );
   }
@@ -145,6 +158,9 @@ export async function savePersonName(
     for (const name of patient.names) {
       replaceColumns = {
         person_id: insertMap.patient,
+        creator: userMap[name.creator],
+        changed_by: name.changed_by ? userMap[name.changed_by] : null,
+        voided_by: name.voided_by ? userMap[name.voided_by] : null,
       };
       await CM.query(
         toPersonNameInsertStatement(name, replaceColumns),

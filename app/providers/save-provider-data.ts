@@ -14,28 +14,34 @@ export default async function saveProviderData(
   patient: PatientData,
   insertMap: InsertedMap,
   kemrCon: Connection,
-  amrsCon: Connection
+  amrsCon: Connection,
+  locationId: any
 ) {
-  const providers = await fetchKemrPersonProviderIds(kemrCon);
+  const providers = await fetchKemrPersonProviderIds(amrsCon);
   if (
     providers.find((prov: any) => prov.person_id === patient.person.person_id)
   ) {
     console.log("Person is a provider");
     provider.person_id = insertMap.patient;
-    return saveProvider(provider[0], amrsCon, insertMap);
+    return saveProvider(provider[0], amrsCon, insertMap, locationId);
   }
 }
 
 export async function saveProvider(
   provider: Provider,
   connection: Connection,
-  insertMap: InsertedMap
+  insertMap: InsertedMap,
+  locationId: any
 ) {
   const userMap = UserMap.instance.userMap;
   let replaceColumns = {};
   if (userMap) {
     replaceColumns = {
       person_id: insertMap.patient,
+      location_id: locationId,
+      creator: userMap[provider.creator],
+      changed_by: provider.changed_by ? userMap[provider.changed_by] : null,
+      voided_by: provider.retired ? userMap[provider.retired_by] : null,
     };
   }
   await CM.query(

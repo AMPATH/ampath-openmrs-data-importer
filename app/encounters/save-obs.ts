@@ -16,7 +16,8 @@ export default async function savePatientObs(
   obsToInsert: Obs[],
   patient: PatientData,
   insertMap: InsertedMap,
-  connection: Connection
+  connection: Connection,
+  location_id: any
 ) {
   await ConceptMapper.instance.initialize();
   await UserMapper.instance.initialize();
@@ -27,7 +28,8 @@ export default async function savePatientObs(
     insertMap.patient,
     insertMap.encounters,
     insertMap.orders,
-    connection
+    connection,
+    location_id
   );
   insertMap.obs = map;
   // console.log(insertMap);
@@ -63,7 +65,7 @@ export async function updateObsGroupIds(
       }
       await CM.query(
         toObsGroupIdUpdateStatement(
-          obs.amrs_obs_id,
+          obs.obs_group_id,
           insertMap.obs[obs.obs_group_id]
         ),
         connection
@@ -78,7 +80,8 @@ export async function saveObs(
   newPatientId: number,
   encounterMap: any,
   orderMap: OrderMap,
-  connection: Connection
+  connection: Connection,
+  locationId: any
 ) {
   let obsMap: ObsMap = {};
   let skippedObsCount = 0;
@@ -95,14 +98,19 @@ export async function saveObs(
       newPatientId,
       UserMapper.instance.userMap,
       encounterMap,
-      orderMap
+      orderMap,
+      locationId
     );
     // console.log('sql', sql);
+    await CM.query("SET FOREIGN_KEY_CHECKS = 0", connection);
     const results = await CM.query(sql, connection); // TODO save once encounters are ready
     obsMap[sourceObs[i].obs_id] = results.insertId;
     sourceObs[i].amrs_obs_id = results.insertId;
   }
-  console.log("Skipped obs count " + skippedObsCount + "/" + sourceObs.length);
+  console.log(
+    "Skipped obs count " + skippedObsCount + "/" + sourceObs.length,
+    obsMap
+  );
   return obsMap;
 }
 
@@ -112,25 +120,24 @@ export function toObsInsertStatement(
   newPatientId: number,
   userMap: any,
   encounterMap: any,
-  orderMap: OrderMap
+  orderMap: OrderMap,
+  locationId: any
 ) {
   if (sourceObs.order_id && !orderMap[sourceObs.order_id]) {
     console.warn(
       ` Order ID ${sourceObs.order_id} not found. Required by obs id ${sourceObs.obs_id}`
     );
   }
+  //console.log("encounter map", sourceObs.encounter_id, encounterMap);
   let replaceColumns = {
     creator: userMap[sourceObs.creator],
-    voided_by: userMap[sourceObs.voided_by],
+    voided_by: sourceObs.voided_by ? userMap[sourceObs.voided_by] : null,
     person_id: newPatientId,
     encounter_id: encounterMap[sourceObs.encounter_id] || null,
-    location_id: 214, //TODO replace with kapenguria location id,
+    location_id: locationId, //TODO replace with kapenguria location id,
     order_id: orderMap[sourceObs.order_id] || null,
-    status: "FINAL",
-    obs_group_id: null,
-    value_coded_name_id: null, //TODO replace with value_coded_name_id
-    previous_version: null, //TODO replace with previous_version
   };
+
   return toInsertSql(
     obs,
     ["obs_id", "amrs_obs_id", "value_boolean", "status", "interpretation"],

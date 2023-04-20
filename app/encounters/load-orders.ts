@@ -18,6 +18,7 @@ export async function getEncounterUUIDByID(
   connection: Connection
 ) {
   const sql = `select * from encounter where encounter_id = ${encounter_id}`;
+  console.log("klast", sql);
   let results: Encounter[] = await CM.query(sql, connection);
   return results[0];
 }

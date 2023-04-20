@@ -15,7 +15,8 @@ export default async function savePatientOrders(
   ordersToInsert: Order[],
   patient: PatientData,
   insertMap: InsertedMap,
-  connection: Connection
+  connection: Connection,
+  amrsCon: Connection
 ) {
   await ConceptMapper.instance.initialize();
   await UserMapper.instance.initialize();
@@ -29,7 +30,7 @@ export default async function savePatientOrders(
     insertMap.encounters,
     ProviderMapper.instance.providerMap,
     connection,
-    connection
+    amrsCon
   );
   insertMap.orders = map;
 }
@@ -92,19 +93,23 @@ export async function toOrdersInsertStatement(
   emrcon: Connection
 ) {
   console.log("orders", encounterMap, sourceOrder);
+  let oldEncounterId: any = await getEncounterID(
+    sourceOrder.encounter_id,
+    amrcon,
+    emrcon
+  );
   let replaceColumns = {
-    creator: 1,
-    voided_by: 1,
-    orderer: 1,
     // order_reason: conceptMap[sourceOrder.order_reason],
     patient_id: newPatientId,
-    encounter_id: await getEncounterID(
-      sourceOrder.encounter_id,
-      amrcon,
-      emrcon
-    ),
+    encounter_id: oldEncounterId,
+    location_id: 5966,
+    orderer: 1,
+    creator: userMap[sourceOrder.creator],
+    changed_by: sourceOrder.voided_by ? userMap[sourceOrder.voided_by] : null,
+    voided_by: sourceOrder.voided_by ? userMap[sourceOrder.voided_by] : null,
     previous_order_id: null, //TODO replace with previous_version
   };
+  console.log("DOE", replaceColumns);
   return toInsertSql(order, ["order_id"], "orders", replaceColumns);
 }
 export async function getEncounterID(
@@ -118,11 +123,11 @@ export async function getEncounterID(
   console.log("ola ola", amrsencounter, id);
   //get encounter id using uuid
   let emrEncounter: Encounter = await getEncounterIDByUUID(
-    amrsencounter.uuid,
+    amrsencounter?.uuid,
     emrcon
   );
   console.log("emrEncounter", emrEncounter);
-  return emrEncounter.encounter_id;
+  return emrEncounter ? emrEncounter.encounter_id : 0;
 }
 export function prepareOrders(
   ordersToInsert: Order[],

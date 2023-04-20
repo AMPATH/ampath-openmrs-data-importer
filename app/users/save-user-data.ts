@@ -17,7 +17,9 @@ export async function saveUser(user: UserData, connection: Connection) {
 }
 
 export function toUserInsertStatement(user: User) {
-  return toInsertSql(user, ["user_id", "system_id"], "users");
+  user.creator = 2;
+  user.retired_by = 2;
+  return toInsertSql(user, ["user_id", "system_id", "changed_by"], "users");
 }
 
 export function toInsertSql(obj: any, excludeColumns: string[], table: string) {

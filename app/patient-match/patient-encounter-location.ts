@@ -1,3 +1,4 @@
+import { Connection } from "mysql";
 import ConnectionManager from "../connection-manager";
 import { fetchPersonIdByUuid } from "../patients/load-patient-data";
 
@@ -12,4 +13,15 @@ export default async function fetchAmrsPatientEncounterLocations(
   let results: any[] = await ConnectionInstance.query(sql, amrsConnection);
   //await amrsConnection.destroy();
   return results;
+}
+
+export async function fetchDestinationLocationId(
+  sourceLocation: string,
+  connection: Connection
+) {
+  // const amrsConnection = await ConnectionInstance.getConnectionAmrs();
+  const sql = `SELECT location_id FROM location where uuid= '${sourceLocation}'`;
+  let results: any[] = await ConnectionInstance.query(sql, connection);
+  console.log("Source Location", sql);
+  return results[0].location_id;
 }

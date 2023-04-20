@@ -121,7 +121,7 @@ export async function fetchPatientPrograms(
   personId: number,
   connection: Connection
 ) {
-  const sql = `select * from kenya_emr1.patient_program where patient_id= ${personId} and voided=0`;
+  const sql = `select * from patient_program where patient_id= ${personId} and voided=0`;
   let results: PatientProgram[] = await CM.query(sql, connection);
   return results;
 }

@@ -12,7 +12,8 @@ export async function savePersonAttributes(
   patient: PatientData,
   insertMap: InsertedMap,
   AmrsConnection: Connection,
-  EmrConnection: Connection
+  EmrConnection: Connection,
+  locationId: any
 ) {
   await UserMapper.instance.initialize();
   for (const attribute of patient.attributes) {
@@ -28,9 +29,13 @@ export async function savePersonAttributes(
     //   attributeID,
     //   attribute.person_attribute_type_id
     // );
-    // let userMap=UserMapper.instance.userMap;
+    let userMap = UserMapper.instance.userMap;
     let replaceColumns = {
       person_id: insertMap.patient,
+      location_id: locationId,
+      creator: userMap[attribute.creator],
+      changed_by: attribute.changed_by ? userMap[attribute.changed_by] : null,
+      voided_by: attribute.voided_by ? userMap[attribute.voided_by] : null,
     };
     await CM.query(
       toPatientAttributeInsertStatement(attribute, replaceColumns),

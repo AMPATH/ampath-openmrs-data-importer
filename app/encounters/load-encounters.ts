@@ -122,3 +122,11 @@ export async function loadEncounterFormsByUuid(
   let results: any = await CM.query(sql, connection);
   return results.length > 0 ? results[0] : null;
 }
+export async function loadEncounterFormsById(
+  formId: number,
+  connection: Connection
+) {
+  const sql = `select uuid from form where form_id=${formId}`;
+  let results: any = await CM.query(sql, connection);
+  return results.length > 0 ? results[0] : null;
+}

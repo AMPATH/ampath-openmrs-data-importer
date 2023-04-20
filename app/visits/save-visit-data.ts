@@ -10,7 +10,8 @@ export default async function saveVisitData(
   patient: PatientData,
   insertMap: InsertedMap,
   kemrCon: Connection,
-  amrsCon: Connection
+  amrsCon: Connection,
+  locationId: any
 ) {
   await UserMapper.instance.initialize();
   // console.log("patient visits", patient.visits);
@@ -20,6 +21,7 @@ export default async function saveVisitData(
       insertMap.patient,
       insertMap,
       kemrCon,
+      locationId,
       UserMapper.instance.userMap
     );
   }
@@ -30,12 +32,18 @@ export async function saveVisit(
   patientId: number,
   insertMap: InsertedMap,
   connection: Connection,
+  locationId: any,
   userMap?: any
 ) {
   let replaceColumns = {};
+  console.log("User ma", userMap[29]);
   if (userMap) {
     replaceColumns = {
       patient_id: patientId,
+      location_id: locationId,
+      creator: userMap[visit.creator],
+      changed_by: visit.changed_by ? userMap[visit.changed_by] : null,
+      voided_by: visit.voided_by ? userMap[visit.voided_by] : null,
     };
   }
 

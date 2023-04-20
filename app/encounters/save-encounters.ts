@@ -4,7 +4,13 @@ import ConnectionManager from "../connection-manager";
 import UserMapper from "../users/user-map";
 import toInsertSql from "../prepare-insert-sql";
 import { InsertedMap } from "../inserted-map";
-import { fetchEncounterProviders } from "./load-encounters";
+import {
+  fetchAmrsEncounterType,
+  fetchEncounterProviders,
+  fetchEncounterType,
+  loadEncounterFormsById,
+  loadEncounterFormsByUuid,
+} from "./load-encounters";
 import ProviderMapper from "../providers/provider-map";
 import FormMapper from "./form-map";
 
@@ -16,7 +22,8 @@ export default async function saveEncounterData(
   amrsconnection: Connection,
   kemrConnection: Connection,
   personId: number,
-  encounterType: number
+  encounterType: number,
+  locationId: any
 ) {
   //Todo add form mapper
   await UserMapper.instance.initialize();
@@ -28,7 +35,9 @@ export default async function saveEncounterData(
     insertMap,
     personId,
     encounterType,
-    UserMapper.instance.userMap
+    locationId,
+    UserMapper.instance.userMap,
+    FormMapper.instance.formMap
   );
 }
 export async function saveEncounter(
@@ -38,9 +47,10 @@ export async function saveEncounter(
   insertMap: InsertedMap,
   personId: number,
   encounterType: number,
-  userMap?: any
+  locationId: any,
+  userMap?: any,
+  formMap?: any
 ) {
-  let replaceColumns = { patient_id: insertMap.patient };
   // Map encounter to respective kenyaemr encounters and forms
 
   //console.log("ALL", encounter);
@@ -48,10 +58,46 @@ export async function saveEncounter(
   //Perform enrollment with just one encounter once
   let encCount = 0;
   for (const enc of _encounter) {
-    await CM.query(
+    //resolve encountertype
+    let sourceEncounterType = await fetchEncounterType(
+      enc.encounter_type,
+      amrsConnection
+    );
+    let destinationEncounterTypeID = await fetchAmrsEncounterType(
+      sourceEncounterType.uuid,
+      kemrsConnection
+    );
+    let sourceFormId = await loadEncounterFormsById(
+      enc.form_id,
+      amrsConnection
+    );
+    let destinationFormId = await loadEncounterFormsByUuid(
+      sourceFormId?.uuid,
+      kemrsConnection
+    );
+
+    console.log(
+      "Resolving encountertyoe",
+      enc.form_id,
+      sourceFormId,
+      destinationFormId
+    );
+    let replaceColumns = {
+      patient_id: insertMap.patient,
+      location_id: locationId,
+      encounter_type: destinationEncounterTypeID.encounter_type_id,
+      form_id: destinationFormId ? destinationFormId.form_id : null,
+      creator: userMap[enc.creator],
+      changed_by: enc.changed_by ? userMap[enc.changed_by] : null,
+      voided_by: enc.voided_by ? userMap[enc.voided_by] : null,
+      visit_id: insertMap.visits[enc.visit_id],
+    };
+
+    let result = await CM.query(
       toEncounterInsertStatement(enc, replaceColumns),
       kemrsConnection
     );
+    insertMap.encounters[enc.encounter_id] = result.insertId;
   }
 }
 //CM.releaseConnections(kemrsConnection,amrsConnection)
@@ -75,7 +121,9 @@ export async function saveEncounterProviderData(
     if (enc_provider) {
       replaceColumns = {
         encounter_id: encounterId,
-        provider_id: providerId + "-Migrated",
+        provider_id: 1,
+        creator: 2,
+        changed_by: enc.changed_by ? 2 : null,
       };
     }
     let encounterProviderExist = await fetchEncounterProviders(

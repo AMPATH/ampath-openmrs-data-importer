@@ -28,19 +28,25 @@ export async function savePatientIdentifiers(
   identifiersToSave: PatientIdentifier[],
   patient: PatientData,
   insertMap: InsertedMap,
-  connection: Connection
+  connection: Connection,
+  destinationLocationId: any
 ) {
-  const a = await handleAmrsIdentifiers(identifiersToSave);
-  await saveKnownIdentifiers(identifiersToSave, insertMap, connection);
+  await saveKnownIdentifiers(
+    identifiersToSave,
+    insertMap,
+    connection,
+    destinationLocationId
+  );
 }
 
 export async function saveKnownIdentifiers(
   identifiers: PatientIdentifier[],
   insertMap: InsertedMap,
-  connection: Connection
+  connection: Connection,
+  locationId: any
 ) {
   for (const p of identifiers) {
-    await saveIdentifier(p, insertMap, connection);
+    await saveIdentifier(p, insertMap, connection, locationId);
   }
 }
 
@@ -111,7 +117,8 @@ export function handlePrepId(identifier: PatientIdentifier) {
 export async function saveIdentifier(
   identifier: PatientIdentifier,
   insertMap: InsertedMap,
-  connection: Connection
+  connection: Connection,
+  locationId: any
 ) {
   // console.log("user person id", personId);
   const userMap = UserMapper.instance.userMap;
@@ -119,6 +126,10 @@ export async function saveIdentifier(
   if (userMap) {
     replaceColumns = {
       patient_id: insertMap.patient,
+      location_id: locationId,
+      creator: userMap[identifier.creator],
+      changed_by: identifier.changed_by ? userMap[identifier.changed_by] : null,
+      voided_by: identifier.voided_by ? userMap[identifier.voided_by] : null,
     };
   }
   const results = await CM.query(

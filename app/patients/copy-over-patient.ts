@@ -14,9 +14,13 @@ import { savePatientIdentifiers } from "./save-identifiers";
 import { savePersonAttributes } from "./save-person-attribute";
 import savePatientOrders from "../encounters/save-orders";
 import savePatientObs from "../encounters/save-obs";
+import saveProviderData from "../providers/save-provider-data";
 const CM = ConnectionManager.getInstance();
 
-export default async function transferPatientToAmrs(personId: number) {
+export default async function transferPatientToAmrs(
+  personId: number,
+  destinationLocation: any
+) {
   const amrsEmrCon = await CM.getConnectionAmrs();
   const patient = await loadPatientData(personId, amrsEmrCon);
   await CM.commitTransaction(amrsEmrCon);
@@ -49,11 +53,24 @@ export default async function transferPatientToAmrs(personId: number) {
         patient.identifiers,
         patient,
         insertMap,
-        emrcon
+        emrcon,
+        destinationLocation
       );
-      await savePersonAttributes(patient, insertMap, amrsEmrCon, emrcon);
+      await savePersonAttributes(
+        patient,
+        insertMap,
+        amrsEmrCon,
+        emrcon,
+        destinationLocation
+      );
       // TODO Create visits for all encounters and backdate to 3 hrs.
-      await saveVisitData(patient, insertMap, emrcon, amrsEmrCon);
+      await saveVisitData(
+        patient,
+        insertMap,
+        emrcon,
+        amrsEmrCon,
+        destinationLocation
+      );
       //Saves other encounters
       await saveEncounterData(
         patient.encounter,
@@ -61,24 +78,40 @@ export default async function transferPatientToAmrs(personId: number) {
         amrsEmrCon,
         emrcon,
         personId,
-        2
+        2,
+        destinationLocation
       );
-      await savePatientObs(patient.obs, patient, insertMap, emrcon);
+      await savePatientOrders(
+        patient.orders,
+        patient,
+        insertMap,
+        emrcon,
+        amrsEmrCon
+      );
+      await savePatientObs(
+        patient.obs,
+        patient,
+        insertMap,
+        emrcon,
+        destinationLocation
+      );
       await saveProgramEnrolments(
         patient.patientPrograms,
         patient,
         insertMap,
-        emrcon
+        emrcon,
+        destinationLocation
       );
-      // await saveProviderData(
-      //   patient.provider,
-      //   patient,
-      //   insertMap,
-      //   emrcon,
-      //   amrsEmrCon
-      // );
-      await savePatientOrders(patient.orders, patient, insertMap, emrcon);
-      //await CM.commitTransaction(emrcon);
+      await saveProviderData(
+        patient.provider,
+        patient,
+        insertMap,
+        emrcon,
+        amrsEmrCon,
+        destinationLocation
+      );
+
+      // await CM.commitTransaction(emrcon);
       await CM.rollbackTransaction(emrcon);
       // await CM.releaseConnections(emrcon, amrsEmrCon);
       return { synced: true, message: null };
