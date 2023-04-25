@@ -20,7 +20,7 @@ export async function fetchDestinationLocationId(
   connection: Connection
 ) {
   // const amrsConnection = await ConnectionInstance.getConnectionAmrs();
-  const sql = `SELECT location_id FROM location where uuid= '${sourceLocation}'`;
+  const sql = `SELECT location_id FROM location_attribute where value_reference= ${sourceLocation}`;
   let results: any[] = await ConnectionInstance.query(sql, connection);
   console.log("Source Location", sql);
   return results[0].location_id;

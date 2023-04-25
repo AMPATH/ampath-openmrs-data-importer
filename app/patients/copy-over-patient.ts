@@ -1,8 +1,10 @@
 import ConnectionManager from "../connection-manager";
 import savePatientData, {
   savePatient,
+  savePatientContacts,
   savePersonAddress,
   savePersonName,
+  savePersonRelationship,
 } from "./save-new-patient";
 import loadPatientData, { loadPatientDataByUuid } from "./load-patient-data";
 import saveVisitData from "../visits/save-visit-data";
@@ -29,7 +31,6 @@ export default async function transferPatientToAmrs(
   if (patient.person.dead == 0) {
     try {
       let saved = { person: patient.person };
-
       await savePatientData(patient, emrcon);
       saved = await loadPatientDataByUuid(patient.person.uuid, emrcon);
       if (patient.patient) {
@@ -110,10 +111,11 @@ export default async function transferPatientToAmrs(
         amrsEmrCon,
         destinationLocation
       );
-
-      // await CM.commitTransaction(emrcon);
+      await savePatientContacts(patient, emrcon, insertMap, amrsEmrCon);
+      await savePersonRelationship(patient, emrcon, insertMap, amrsEmrCon);
+      //await CM.commitTransaction(emrcon);
       await CM.rollbackTransaction(emrcon);
-      // await CM.releaseConnections(emrcon, amrsEmrCon);
+      await CM.releaseConnections(emrcon, amrsEmrCon);
       return { synced: true, message: null };
     } catch (er) {
       console.error("Error saving patient: " + patient.person.person_id, er);

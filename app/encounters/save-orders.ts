@@ -92,7 +92,6 @@ export async function toOrdersInsertStatement(
   amrcon: Connection,
   emrcon: Connection
 ) {
-  console.log("orders", encounterMap, sourceOrder);
   let oldEncounterId: any = await getEncounterID(
     sourceOrder.encounter_id,
     amrcon,
@@ -109,7 +108,6 @@ export async function toOrdersInsertStatement(
     voided_by: sourceOrder.voided_by ? userMap[sourceOrder.voided_by] : null,
     previous_order_id: null, //TODO replace with previous_version
   };
-  console.log("DOE", replaceColumns);
   return toInsertSql(order, ["order_id"], "orders", replaceColumns);
 }
 export async function getEncounterID(
@@ -120,13 +118,11 @@ export async function getEncounterID(
   //get encounter uuid by id from amrs
 
   let amrsencounter: Encounter = await getEncounterUUIDByID(id, amrcon);
-  console.log("ola ola", amrsencounter, id);
   //get encounter id using uuid
   let emrEncounter: Encounter = await getEncounterIDByUUID(
     amrsencounter?.uuid,
     emrcon
   );
-  console.log("emrEncounter", emrEncounter);
   return emrEncounter ? emrEncounter.encounter_id : 0;
 }
 export function prepareOrders(

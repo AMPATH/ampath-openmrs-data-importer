@@ -17,7 +17,7 @@ async function start(action: string, start: string, end: string) {
   let destinationConnection = await CM.getConnectionKenyaemr();
   //Set Destination location ID;
   let destinationLocationID = await fetchDestinationLocationId(
-    "e8d6a488-94af-4526-80c2-886c41ee4ed4",
+    "12612",
     destinationConnection
   );
   const patientIds = await readCSV(patientIdsPath);

@@ -76,7 +76,6 @@ export async function saveProgramEnrolment(
   connection: Connection,
   locationId: any
 ) {
-  // console.log("user person id", personId);
   const userMap = UserMapper.instance.userMap;
   let replaceColumns = {};
   if (userMap) {

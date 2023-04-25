@@ -11,6 +11,8 @@ import {
   Order,
   Encounter,
   PatientProgram,
+  PatientContact,
+  Relationship,
 } from "../tables.types";
 
 export type PatientData = {
@@ -26,4 +28,6 @@ export type PatientData = {
   visits: Visit[];
   provider: Provider;
   encounter: Encounter[];
+  patientContact: PatientContact[];
+  relationship: Relationship[];
 };

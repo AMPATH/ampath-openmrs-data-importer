@@ -17,18 +17,6 @@ export async function savePersonAttributes(
 ) {
   await UserMapper.instance.initialize();
   for (const attribute of patient.attributes) {
-    // let replaceColumns = {};
-    // //Create attribute type if missing
-    // let attributeID = await fetchorCreatePersonAttributeTypes(
-    //   AmrsConnection,
-    //   EmrConnection,
-    //   attribute.person_attribute_type_id
-    // );
-    // console.log(
-    //   "Attribute ID",
-    //   attributeID,
-    //   attribute.person_attribute_type_id
-    // );
     let userMap = UserMapper.instance.userMap;
     let replaceColumns = {
       person_id: insertMap.patient,

@@ -81,7 +81,6 @@ export async function getPreviousRegimenEncounter(
 ) {
   const sql = `select encounter_id,encounter_datetime from encounter where patient_id="${params}" and encounter_type=29 and encounter_datetime < "${date}" order by encounter_datetime asc limit 1`;
   let results: Encounter[] = await CM.query(sql, connection);
-  console.log("oold enc", sql);
   return results[0];
 }
 export async function LoadCurrentHivSummary(
@@ -90,7 +89,6 @@ export async function LoadCurrentHivSummary(
 ) {
   const sql = `SELECT * FROM etl.flat_hiv_summary_v15b a WHERE a.person_id = ${patientId} AND a.encounter_type IN (1,2,4,3,105,106) and a.prev_arv_meds != a.cur_arv_meds and a.prev_arv_start_date is not null ORDER BY a.visit_num DESC limit 1;`;
   let results: any = await CM.query(sql, connection);
-  console.log("Hiv summary", results);
   return results[0];
 }
 export async function LoadSingleHivSummary(

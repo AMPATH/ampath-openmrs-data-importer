@@ -82,7 +82,6 @@ function handleAmrsIdentifiers(identifiers: PatientIdentifier[]) {
     }
     formattedKenyaEMRIdentifiers.push(newId);
   }
-  console.log("my identifiers", formattedKenyaEMRIdentifiers);
   return formattedKenyaEMRIdentifiers;
 }
 
@@ -120,7 +119,6 @@ export async function saveIdentifier(
   connection: Connection,
   locationId: any
 ) {
-  // console.log("user person id", personId);
   const userMap = UserMapper.instance.userMap;
   let replaceColumns = {};
   if (userMap) {
@@ -136,7 +134,6 @@ export async function saveIdentifier(
     toIdentifierInsertStatement(identifier, replaceColumns),
     connection
   );
-  // console.log('insert results', results);
   insertMap.patientIdentifier[identifier.patient_identifier_id] =
     results.insertId;
 }

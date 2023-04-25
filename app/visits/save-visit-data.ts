@@ -14,7 +14,6 @@ export default async function saveVisitData(
   locationId: any
 ) {
   await UserMapper.instance.initialize();
-  // console.log("patient visits", patient.visits);
   for (const visit of patient.visits) {
     await saveVisit(
       visit,
@@ -36,7 +35,6 @@ export async function saveVisit(
   userMap?: any
 ) {
   let replaceColumns = {};
-  console.log("User ma", userMap[29]);
   if (userMap) {
     replaceColumns = {
       patient_id: patientId,
@@ -51,7 +49,6 @@ export async function saveVisit(
     toVisitInsertStatement(visit, replaceColumns),
     connection
   );
-  // console.log("Insert ID", results.insertId);
   insertMap.visits[visit.visit_id] = results.insertId;
 }
 
@@ -64,7 +61,6 @@ export async function saveVisitAttribute(
   connection: Connection
 ) {
   const userMap = UserMapper.instance.userArray;
-  // console.log("User Map", userMap);
   let replaceColumns = {};
   if (userMap) {
     replaceColumns = {
@@ -118,6 +114,5 @@ export function toInsertSql(
     }
   }
   const sql = mysql.format(`INSERT INTO ${table} SET ?`, [set]);
-  console.log("SQL::: ", sql);
   return sql;
 }

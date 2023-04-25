@@ -10,6 +10,8 @@ import {
   PatientProgram,
   PersonAttributeType,
   Encounter,
+  PatientContact,
+  Relationship,
 } from "../tables.types";
 import { PatientData } from "./patient-data";
 import loadPatientObs from "../encounters/load-patient-obs";
@@ -44,6 +46,11 @@ export default async function loadPatientData(
   let provider = await fetchProvider(patientId, connection);
   let encounters = await loadencounters(patientId, connection);
   let patientPrograms = await fetchPatientPrograms(patientId, connection);
+  let patientContacts = await fetchPatientContact(patientId, connection);
+  let patientRelationship = await fetchPatientRelationship(
+    patientId,
+    connection
+  );
   let results: PatientData = {
     person: person,
     patient: patient,
@@ -57,6 +64,8 @@ export default async function loadPatientData(
     obs: obs,
     provider: provider,
     encounter: encounters,
+    patientContact: patientContacts,
+    relationship: patientRelationship,
   };
   return results;
 }
@@ -83,6 +92,23 @@ export async function fetchPatient(personId: number, connection: Connection) {
   return results[0];
 }
 
+export async function fetchPatientContact(
+  personId: number,
+  connection: Connection
+) {
+  const sql = `select * from kenyaemr_hiv_testing_patient_contact where patient_related_to= ${personId}`;
+  let results: PatientContact[] = await CM.query(sql, connection);
+  return results;
+}
+export async function fetchPatientRelationship(
+  personId: number,
+  connection: Connection
+) {
+  const sql = `select * from relationship where person_a= ${personId}`;
+  let results: Relationship[] = await CM.query(sql, connection);
+  return results;
+}
+
 export async function fetchAddress(personId: number, connection: Connection) {
   const sql = `select * from person_address where person_id= ${personId} and voided=0`;
   let results: Address[] = await CM.query(sql, connection);
@@ -104,7 +130,6 @@ export async function fetchPersonAttributes(
 ) {
   const sql = `select * from person_attribute where person_id= ${personId} and voided=0`;
   let results: PersonAttribute[] = await CM.query(sql, connection);
-  //console.log("Iman", sql, results);
   return results;
 }
 
@@ -141,8 +166,6 @@ export async function fetchorCreatePersonAttributeTypes(
   if (results.length > 0) {
     const sql2 = `select * from person_attribute_type where uuid ="${results[0].uuid}"`;
     let emrAttr: PersonAttributeType[] = await CM.query(sql2, emrConnection);
-
-    console.log("chomune", emrAttr);
     if (emrAttr.length > 0) {
       return emrAttr[0].person_attribute_type_id;
     } else {
@@ -156,7 +179,6 @@ export async function fetchorCreatePersonAttributeTypes(
         toVisitAttributeInsertStatement(results[0], replaceColumns),
         emrConnection
       );
-      console.log("MEEEEE", attrID);
       return attrID.insertId;
     }
   }

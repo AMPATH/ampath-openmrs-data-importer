@@ -19,7 +19,7 @@ export default function toInsertSql(
     }
   }
   const sql = mysql.format(`insert INTO ${table} SET ?`, [set]);
-  console.log("SQL::: ", sql);
+  //console.log("SQL::: ", sql);
   const filePath = "sql.txt";
 
   fs.appendFile(filePath, sql + "\n", (err) => {
@@ -54,6 +54,6 @@ export function toUpdateSql(
     `Update ${table} SET ? where ${primaryKeyColumnName} = ${replaceColumns[primaryKeyColumnName]}`,
     [set]
   );
-  console.log("SQL::: ", sql);
+  //console.log("SQL::: ", sql);
   return sql;
 }

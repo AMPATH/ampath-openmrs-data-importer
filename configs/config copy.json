@@ -1,0 +1,28 @@
+{
+    "kenyaemrConnection": {
+        "host": "10.50.80.110",
+        "user": "kenyaemr",
+        "password": "kenyaemr",
+        "database": "kenya_emr",
+        "port": "3306",
+        "connectionLimit":100
+        
+    },
+    "amrsConnection": {
+        "host": "10.50.80.110",
+        "user": "kenyaemr",
+        "password": "kenyaemr",
+        "database": "openmrs",
+        "port": "3306",
+        "connectionLimit":100
+    },
+    "openmrs": {
+        "host":"10.50.80.110",
+        "username":"drono",
+        "password":"Rono2019",
+        "baseurl":"https://kibana.ampath.or.ke",
+        "port":"8086",
+        "applicationName":"amrs",
+        "https":"true"
+    }
+}
