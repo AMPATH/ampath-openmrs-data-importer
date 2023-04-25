@@ -144,8 +144,8 @@ export async function savePersonRelationship(
       related_patient_id = a.insertId;
 
       replaceColumns = {
-        patient_id: related_patient_id ? related_patient_id : a.person_id,
-        patient_related_to: insertMap.patient,
+        person_a: insertMap.patient,
+        person_b: related_patient_id ? related_patient_id : a.person_id,
         changed_by: r.changed_by ? userMap[r.changed_by] : null,
         voided_by: r.voided_by ? userMap[r.voided_by] : null,
       };

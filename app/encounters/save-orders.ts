@@ -16,7 +16,8 @@ export default async function savePatientOrders(
   patient: PatientData,
   insertMap: InsertedMap,
   connection: Connection,
-  amrsCon: Connection
+  amrsCon: Connection,
+  location_id: any
 ) {
   await ConceptMapper.instance.initialize();
   await UserMapper.instance.initialize();
@@ -30,7 +31,8 @@ export default async function savePatientOrders(
     insertMap.encounters,
     ProviderMapper.instance.providerMap,
     connection,
-    amrsCon
+    amrsCon,
+    location_id
   );
   insertMap.orders = map;
 }
@@ -46,7 +48,8 @@ export async function saveOrder(
   encounterMap: any,
   providerMap: any,
   connection: Connection,
-  amrcon: Connection
+  amrcon: Connection,
+  location_id: any
 ) {
   let orderMap: OrderMap = {};
   let skippedOrderCount = 0;
@@ -69,7 +72,8 @@ export async function saveOrder(
       encounterMap,
       providerMap,
       amrcon,
-      connection
+      connection,
+      location_id
     );
     // console.log('sql', sql);
     const results = await CM.query(sql, connection); // TODO save once encounters are ready
@@ -90,7 +94,8 @@ export async function toOrdersInsertStatement(
   encounterMap: any,
   providerMap: any,
   amrcon: Connection,
-  emrcon: Connection
+  emrcon: Connection,
+  location_id: any
 ) {
   let oldEncounterId: any = await getEncounterID(
     sourceOrder.encounter_id,
@@ -101,7 +106,7 @@ export async function toOrdersInsertStatement(
     // order_reason: conceptMap[sourceOrder.order_reason],
     patient_id: newPatientId,
     encounter_id: oldEncounterId,
-    location_id: 5966,
+    location_id: location_id,
     orderer: 1,
     creator: userMap[sourceOrder.creator],
     changed_by: sourceOrder.voided_by ? userMap[sourceOrder.voided_by] : null,

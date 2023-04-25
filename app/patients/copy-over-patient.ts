@@ -87,7 +87,8 @@ export default async function transferPatientToAmrs(
         patient,
         insertMap,
         emrcon,
-        amrsEmrCon
+        amrsEmrCon,
+        destinationLocation
       );
       await savePatientObs(
         patient.obs,
