@@ -1,26 +1,16 @@
 {
-  "kenyaemrConnection": {
+  "destinationDatabase": {
     "host": "",
     "user": "",
     "password": "",
     "database": "",
     "port": ""
   },
-  "amrsConnection": {
+  "sourceDatabase": {
     "host": "",
     "user": "",
     "password": "",
     "database": "",
     "port": ""
-  },
-  "openmrs": {
-    "host": "",
-    "port": 8080,
-    "https": false,
-    "applicationName": "amrs",
-    "username": "",
-    "password": "",
-    "baseurl": "",
-    "kenya_emr_ccc_identifier_type": 0
   }
 }

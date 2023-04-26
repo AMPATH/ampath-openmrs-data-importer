@@ -157,12 +157,12 @@ export async function fetchPersonAttributeTypes(connection: Connection) {
   return results;
 }
 export async function fetchorCreatePersonAttributeTypes(
-  amrsConnection: Connection,
+  sourceDatabase: Connection,
   emrConnection: Connection,
   attributeTypeId: any
 ) {
   const sql = `select * from person_attribute_type where person_attribute_type_id =${attributeTypeId}`;
-  let results: PersonAttributeType[] = await CM.query(sql, amrsConnection);
+  let results: PersonAttributeType[] = await CM.query(sql, sourceDatabase);
   if (results.length > 0) {
     const sql2 = `select * from person_attribute_type where uuid ="${results[0].uuid}"`;
     let emrAttr: PersonAttributeType[] = await CM.query(sql2, emrConnection);

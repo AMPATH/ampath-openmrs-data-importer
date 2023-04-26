@@ -1,3 +1,0 @@
-AMRS,KenyaEMR,KenyaEMR Type,AMRS Type,Description,Comment
-302,302,Coded,N/A,"URINALYSIS ORDER: Normal (1115), Abnormal (1116), Unknown (1067)",Create new concept
-6032,6032,Coded,N/A,"        HEPATIC DISEASE: No (1066), Yes (1065)",Convert Datatype or create new concept

@@ -7,7 +7,6 @@ import { PatientData } from "../patients/patient-data";
 import toInsertSql from "../prepare-insert-sql";
 import { InsertedMap } from "../inserted-map";
 import { OrderMap } from "./save-orders";
-import * as skipObs from "../../metadata/skip-obs.json";
 import * as DM from "../../metadata/data-type-map.json";
 const dataTypeMapping: DataTypeTransformMap = DM as DataTypeTransformMap;
 const CM = ConnectionManager.getInstance();
@@ -19,7 +18,7 @@ export default async function savePatientObs(
   connection: Connection,
   location_id: any
 ) {
-  await ConceptMapper.instance.initialize();
+  //await ConceptMapper.instance.initialize();
   await UserMapper.instance.initialize();
   //let obs = prepareObs(obsToInsert, ConceptMapper.instance);
   let map = await saveObs(
@@ -147,43 +146,9 @@ export function toObsInsertStatement(
 }
 
 export function toObsGroupIdUpdateStatement(obsId: number, obsGroupId: number) {
-  let sql = `UPDATE obs SET obs_group_id = ${obsGroupId} where obs_id = ${obsId}`;
+  let sql = `UPDATE obs SET obs_group_id = ${obsGroupId} where obs_group_id = ${obsId}`;
   console.log("SQL:::", sql);
   return sql;
-}
-
-export function prepareObs(
-  obsToInsert: Obs[],
-  conceptMap: ConceptMapper
-): Obs[] {
-  // replace concept ids with maps and convert to destination concept values
-  // if a missing concept map or unknown data type concept is detected, then throw error
-  let obs: Obs[] = obsToInsert.reduce<Obs[]>((filtered, o): Obs[] => {
-    let obsId = o.obs_id.toString();
-    if ((skipObs as any)[obsId]) {
-      console.log("Skipping obs", (skipObs as any)[obsId]);
-      return filtered;
-    }
-    let newObs: Obs = Object.assign({}, o);
-    // try {
-    // TODO, to remove this before moving running in production
-    assertObsConceptsAreMapped(o, conceptMap.conceptMap);
-    if (dataTypeMapping[o.concept_id]) {
-      // a map is provided to handle concept and type transformations
-      transformObsConcept(dataTypeMapping[o.concept_id], newObs, o);
-    } else {
-      mapObsConcept(newObs, o, conceptMap.conceptMap);
-      //mapObsValue(newObs, o, conceptMap.conceptMap);
-    }
-    // } catch (err) {
-    //   // console.warn('Error:', err);
-    //   newObs.comments = "invalid";
-    // }
-    filtered.push(newObs);
-    return filtered;
-  }, []);
-
-  return obs;
 }
 
 export function assertObsConceptsAreMapped(obs: Obs, conceptMap: ConceptMap) {
@@ -210,25 +175,6 @@ export function transformObsConcept(
   newObs.concept_id = transformInfo.amrs_id;
   transformObsValue(transformInfo, newObs, sourceObs);
 }
-
-export function mapObsConcept(
-  newObs: Obs,
-  sourceObs: Obs,
-  conceptMap: ConceptMap
-) {
-  //newObs.concept_id = parseInt(conceptMap[sourceObs.concept_id].amrs_id);
-}
-
-// export function mapObsValue(
-//   newObs: Obs,
-//   sourceObs: Obs,
-//   conceptMap: ConceptMap
-// ) {
-//   let foundConcept = conceptMap[sourceObs.concept_id];
-//   if (areDatatypeEquivalent(foundConcept)) {
-//     mapMatchingTypeObsValue(newObs, sourceObs, conceptMap);
-//   }
-// }
 
 export type DataTypeTransformMap = {
   [conceptId: string]: DataTypeTransformInfo;
@@ -271,37 +217,5 @@ export function transformObsValue(
       break;
     default:
       throw new Error("Unknown conversion type. Details: " + transformInfo);
-  }
-}
-
-// export function areDatatypeEquivalent(foundConcept: FoundConcept): boolean {
-//   if (foundConcept.datatype === foundConcept.amrs_datatype) {
-//     return true;
-//   }
-
-//   if (
-//     foundConcept.datatype === "Datetime" &&
-//     foundConcept.amrs_datatype === "Date"
-//   ) {
-//     return true;
-//   }
-
-//   if (
-//     foundConcept.datatype === "Date" &&
-//     foundConcept.amrs_datatype === "Datetime"
-//   ) {
-//     return true;
-//   }
-
-//   return false;
-// }
-
-function mapMatchingTypeObsValue(
-  newObs: Obs,
-  sourceObs: Obs,
-  conceptMap: ConceptMap
-) {
-  if (sourceObs.value_coded) {
-    //newObs.value_coded = parseInt(conceptMap[sourceObs.value_coded].amrs_id);
   }
 }

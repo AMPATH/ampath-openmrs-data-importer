@@ -1,8 +1,6 @@
 import ConnectionManager from "./connection-manager";
-import { fetchDestinationLocationId } from "./patient-match/patient-encounter-location";
+import { fetchDestinationLocationId } from "./location/location";
 import transferPatientToAmrs from "./patients/copy-over-patient";
-import saveVisitData from "./visits/save-visit-data";
-import writeCsv from "./write-csv";
 import fs from "fs";
 const CM = ConnectionManager.getInstance();
 const readCSV = require("./read-csv");

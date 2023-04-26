@@ -98,7 +98,7 @@ export async function savePatientContacts(
   let replaceColumns = {};
   if (userMap) {
     for (const p of patient.patientContact) {
-      let related_patient_id = "";
+      let related_patient_id = 0;
       let a = null;
       if (p.patient_id && p.patient_id > 0) {
         let relatedPerson = await fetchPerson(p.patient_id, sourceConnection);
@@ -110,7 +110,7 @@ export async function savePatientContacts(
         related_patient_id = a.insertId;
       }
       replaceColumns = {
-        patient_id: related_patient_id ? related_patient_id : a.person_id,
+        patient_id: a?.person?.person_id ? a?.person_id : related_patient_id,
         patient_related_to: insertMap.patient,
         changed_by: p.changed_by ? userMap[p.changed_by] : null,
         voided_by: p.voided_by ? userMap[p.voided_by] : null,
@@ -132,7 +132,7 @@ export async function savePersonRelationship(
   let replaceColumns = {};
   if (userMap) {
     for (const r of patient.relationship) {
-      let related_patient_id = "";
+      let related_patient_id = 0;
       let a = null;
 
       let relatedPerson = await fetchPerson(r.person_b, sourceConnection);
@@ -145,7 +145,9 @@ export async function savePersonRelationship(
 
       replaceColumns = {
         person_a: insertMap.patient,
-        person_b: related_patient_id ? related_patient_id : a.person_id,
+        person_b: a?.person?.person_id
+          ? a?.person?.person_id
+          : related_patient_id,
         changed_by: r.changed_by ? userMap[r.changed_by] : null,
         voided_by: r.voided_by ? userMap[r.voided_by] : null,
       };
@@ -255,7 +257,7 @@ export async function savePersonName(
     for (const name of patient.names) {
       replaceColumns = {
         person_id: insertMap.patient,
-        creator: userMap[name.creator],
+        creator: userMap[name?.creator],
         changed_by: name.changed_by ? userMap[name.changed_by] : null,
         voided_by: name.voided_by ? userMap[name.voided_by] : null,
       };

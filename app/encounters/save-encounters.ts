@@ -19,7 +19,7 @@ const CM = ConnectionManager.getInstance();
 export default async function saveEncounterData(
   encounters: Encounter[],
   insertMap: InsertedMap,
-  amrsconnection: Connection,
+  sourceDatabase: Connection,
   kemrConnection: Connection,
   personId: number,
   encounterType: number,
@@ -31,7 +31,7 @@ export default async function saveEncounterData(
   return saveEncounter(
     encounters,
     kemrConnection,
-    amrsconnection,
+    sourceDatabase,
     insertMap,
     personId,
     encounterType,
@@ -43,7 +43,7 @@ export default async function saveEncounterData(
 export async function saveEncounter(
   _encounter: Encounter[],
   kemrsConnection: Connection,
-  amrsConnection: Connection,
+  sourceDatabase: Connection,
   insertMap: InsertedMap,
   personId: number,
   encounterType: number,
@@ -61,7 +61,7 @@ export async function saveEncounter(
     //resolve encountertype
     let sourceEncounterType = await fetchEncounterType(
       enc.encounter_type,
-      amrsConnection
+      sourceDatabase
     );
     let destinationEncounterTypeID = await fetchAmrsEncounterType(
       sourceEncounterType.uuid,
@@ -69,7 +69,7 @@ export async function saveEncounter(
     );
     let sourceFormId = await loadEncounterFormsById(
       enc.form_id,
-      amrsConnection
+      sourceDatabase
     );
     let destinationFormId = await loadEncounterFormsByUuid(
       sourceFormId?.uuid,
@@ -100,7 +100,7 @@ export async function saveEncounter(
     insertMap.encounters[enc.encounter_id] = result.insertId;
   }
 }
-//CM.releaseConnections(kemrsConnection,amrsConnection)
+//CM.releaseConnections(kemrsConnection,sourceDatabase)
 export async function saveEncounterProviderData(
   enc: Encounter,
   encounterId: number,

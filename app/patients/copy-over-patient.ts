@@ -114,8 +114,8 @@ export default async function transferPatientToAmrs(
       );
       await savePatientContacts(patient, emrcon, insertMap, amrsEmrCon);
       await savePersonRelationship(patient, emrcon, insertMap, amrsEmrCon);
-      //await CM.commitTransaction(emrcon);
-      await CM.rollbackTransaction(emrcon);
+      await CM.commitTransaction(emrcon);
+      //await CM.rollbackTransaction(emrcon);
       await CM.releaseConnections(emrcon, amrsEmrCon);
       return { synced: true, message: null };
     } catch (er) {

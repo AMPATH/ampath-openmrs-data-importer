@@ -6,8 +6,8 @@ export default class ConnectionManager {
   private amrsPool: Pool;
   private kenyaemrPool: Pool;
   private constructor() {
-    this.amrsPool = this.createPool(config.amrsConnection);
-    this.kenyaemrPool = this.createPool(config.kenyaemrConnection);
+    this.amrsPool = this.createPool(config.sourceDatabase);
+    this.kenyaemrPool = this.createPool(config.destinationDatabase);
   }
   static getInstance(): ConnectionManager {
     if (!ConnectionManager.instance) {

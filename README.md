@@ -1,35 +1,46 @@
-Based on the Assumptions on the Tech Specification:
-Below are tasks and milestones achieved:
+The script is used to merge two openmrs databases with the assumption that we have similar concept dictionary and other metadata
 
-[https://github.com/AMPATH/ampath-openmrs-data-importer/tree/emr-to-emr-skip-mapping](https://github.com/AMPATH/ampath-openmrs-data-importer/tree/emr-to-emr-skip-mapping)
+**Configurations**
 
-1. **OpenMRS Database Merge Script**
-   1. OpenMRS Concepts Mapping to Kenya EMR is done manually
-      1. For other countries there is a need to create alternate mapping
-   2. Assumption that System A and system B do not have comm Patintets )
-      1. If a Person exists in the destination DB, an updated will be done
-   3. For Foreign Keys,
+To allow for merging we will need to configure the database connections. Edit the config.json file inside the configs directory with the right database credentials. Below is a sample config file
 
-**_Package JSON_**
+       {
+         "destinationDatabase": {
+            "host": "localhost",
+            "user": "root",
+            "password": "password",
+            "database": "openmrs",
+            "port": "3306",
+            "connectionLimit":100
 
-_start:update ⇒ Reviews existing users, updates from the new source_
+         },
+         "sourceDatabase": {
+            "host": "localhost",
+            "user": "root",
+            "password": "password",
+            "database": "source_openmrs",
+            "port": "3306",
+            "connectionLimit":100
+         }
+      }
 
-_start:migrate-users: ⇒ Migrate users table_
+**Running Migrations**
 
-**_App Entry Point:_**
+The migrations process should be executed in the following order.
 
-_Fetch PatientsIDs , and patients, add on the CSV._
+1. Migrate users data
 
-_Loop through the CSV_
+   Obtain all user ids in the source database and put them under the user array in `process-user-migration.ts`
 
-`*LoadPatiantData()` → Collect all the attributes columns from the Dataset,\*
+   Run `npm run migrate-users`
+   This ensures that patients will be migrated with the users from the source system.
 
-_Iterate row per row (1 person)_
+2. Migrate Patients data
 
-`*TransferPatientToAmrs()` → Create a Map used to resolve foreign keys\*
+   To migrate patients obtain patient ids from the source database and put them in the `patient_ids.csv` csv file in the metadata directory.
 
-`*savePersonAddress()` → Save the PersonAddress, since we use Users from\*
+   Run `npm run start:create 0...N`
 
-`*toInsertSQL()` → Iterate through the Object, review columns to be excluded, and generate a SQL Insert Statement.\*
+   0 being the index of the starting point and n being the end of the index of patient to migrate.
 
-`*save-obs.ts*`
+   During the migration process, the queries will be logged under the `sql.txt` file and the patients who didn't migrate and were rolledback will be logged on the `failed.txt` file

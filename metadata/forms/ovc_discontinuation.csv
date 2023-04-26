@@ -1,7 +1,0 @@
-Question Concept_id,Type (Question/Answer),emr_concept_id,Mapped CIEL Concept (in KenyaEMR),amrs_concept_id,AMRS CIEL Mapping,,,,,,,,,,,,,,,,,,,,
-,Discontinue OVC,,,,,,,,,,,,,,,,,,,,,,,,
-161555,Exit Reasons,161555,161555,1596,161555,,,,,,,,,,,,,,,,,,,,
-161555,Transfer out to a PEPFAR supported facility,160036,160036,1594,160036,,,,,,,,,,,,,,,,,,,,
-161555,Transfer out to a non PEPFAR supported facility,159492,159492,1594,159492,,,,,,,,,,,,,,,,,,,,
-161555,Exit without graduation,165219,165219,10983,165219,,,,,,,,,,,,,,,,,,,,
-161555,Graduated out of OVC,1267,1267,1267,1267,,,,,,,,,,,,,,,,,,,,

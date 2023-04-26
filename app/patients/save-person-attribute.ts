@@ -11,7 +11,7 @@ const CM = ConnectionManager.getInstance();
 export async function savePersonAttributes(
   patient: PatientData,
   insertMap: InsertedMap,
-  AmrsConnection: Connection,
+  sourceDatabase: Connection,
   EmrConnection: Connection,
   locationId: any
 ) {

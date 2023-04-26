@@ -19,7 +19,7 @@ export default async function savePatientOrders(
   amrsCon: Connection,
   location_id: any
 ) {
-  await ConceptMapper.instance.initialize();
+  //await ConceptMapper.instance.initialize();
   await UserMapper.instance.initialize();
   await ProviderMapper.instance.initialize();
   //let orders = prepareOrders(ordersToInsert, ConceptMapper.instance);

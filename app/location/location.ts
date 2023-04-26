@@ -1,3 +1,6 @@
+import { Connection } from "mysql";
+import ConnectionManager from "../connection-manager";
+
 export default async function transferLocationToEmr(locationid: number) {
   let locations: any = {
     "125": "45",
@@ -326,4 +329,17 @@ export default async function transferLocationToEmr(locationid: number) {
   } else {
     return location_id;
   }
+}
+
+export async function fetchDestinationLocationId(
+  sourceLocation: string,
+  connection: Connection
+) {
+  const ConnectionInstance = ConnectionManager.getInstance();
+
+  // const amrsConnection = await ConnectionInstance.getConnectionAmrs();
+  const sql = `SELECT location_id FROM location_attribute where value_reference= ${sourceLocation}`;
+  let results: any[] = await ConnectionInstance.query(sql, connection);
+  console.log("Source Location", sql);
+  return results[0].location_id;
 }
